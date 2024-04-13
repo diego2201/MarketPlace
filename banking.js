@@ -60,7 +60,7 @@ async function retrieveDataFromContract() {
 
 
 
-// // Function to set data in the contract
+// Function to set data in the contract
 // async function setDataInContract(data) {
 //     try {
 //         // Encode the transaction data
@@ -121,9 +121,6 @@ async function retrieveDataFromContract() {
 //         console.error('Error:', error);
 //     }
 // }
-
-// Function to set data in the contract
-// Function to set data in the contract
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
@@ -131,10 +128,19 @@ async function setDataInContract(data) {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const from = accounts[0];
 
-            // Encode the transaction data
-            const encodedData = contract.methods.setData(data).encodeABI();
+            // Convert the message to sign into hex-encoded UTF-8
+            const encoder = new TextEncoder();
+            const msgUint8 = encoder.encode(data);
+            const msgHex = Array.prototype.map.call(msgUint8, x => ('00' + x.toString(16)).slice(-2)).join('');
+            const msg = `0x${msgHex}`;
 
-            // Build the transaction object
+            // Request personal_sign method from MetaMask
+            const signature = await ethereum.request({
+                method: "personal_sign",
+                params: [msg, from],
+            });
+
+            // Construct the transaction object
             const txObject = {
                 from: from,
                 to: contractAddress,
@@ -142,16 +148,16 @@ async function setDataInContract(data) {
                     to: contractAddress,
                     data: encodedData
                 }),
-                data: encodedData,
+                data: encodedData
             };
 
-            // Sign the transaction locally using MetaMask
-            const signedTx = await window.ethereum.request({
-                method: "eth_sendTransaction",
-                params: [txObject],
-            });
+            // Add the signature to the transaction object
+            txObject['signature'] = signature;
 
-            console.log('Transaction sent:', signedTx);
+            // Send the signed transaction
+            const receipt = await web3.eth.sendTransaction(txObject);
+
+            console.log('Transaction sent. Receipt:', receipt);
 
         } else {
             console.error('MetaMask is not detected.');
@@ -160,6 +166,7 @@ async function setDataInContract(data) {
         console.error('Error:', error);
     }
 }
+
 
 
 
