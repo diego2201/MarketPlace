@@ -1,4 +1,6 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
+
+const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const web3 = new Web3(infuraUrl);
 
 // Contract ABI
@@ -55,14 +57,31 @@ async function retrieveDataFromContract() {
 // Function to set data in the contract
 async function setDataInContract(data) {
     try {
-        // Get the user's accounts from MetaMask
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const from = accounts[0]; // Use the first account
-        
-        // Prompt user to confirm transaction using MetaMask
-        await contract.methods.setData(data).send({ from });
+        // Instantiate the contract
+        const contract = new web3.eth.Contract(contractABI, contractAddress);
+
+        // Encode the transaction data
+        const encodedData = contract.methods.setData(data).encodeABI();
+
+        // Build the transaction object
+        const txObject = {
+            from: account,
+            to: contractAddress,
+            gas: await web3.eth.estimateGas({
+                to: contractAddress,
+                data: encodedData
+            }),
+            data: encodedData
+        };
+
+        // Sign the transaction
+        const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
+
+        // Send the signed transaction
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
         console.log('Data set successfully:', data);
+        console.log('Transaction receipt:', receipt);
     } catch (error) {
         console.error('Error setting data:', error);
     }
