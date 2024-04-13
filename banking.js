@@ -1,7 +1,7 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
 
 const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
-const account = 'fab7e80127424a7c95aadd5be9c525e1'; // Define the account address here
+const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
 
 // Contract ABI
