@@ -1,3 +1,5 @@
+const Tx = require('ethereumjs-tx').Transaction;
+const CryptoJS = require('crypto-js');
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
 const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
@@ -124,41 +126,44 @@ async function retrieveDataFromContract() {
 
 async function setDataInContract(data) {
     try {
-        if (window.ethereum) {
-            // Request access to MetaMask accounts
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const from = accounts[0];
+        // Encode the transaction data
+        const encoder = new TextEncoder();
+        const types = ['uint', 'bytes32', 'bytes20', 'bytes5', 'bytes'];
+        const args = [1, data, '03:00:21 12-12-12', 'true', ''];
+        const fullName = 'addRecord' + '(' + types.join() + ')';
+        const signature = CryptoJS.SHA3(fullName, { outputLength: 256 }).toString(CryptoJS.enc.Hex).slice(0, 8);
+        const dataHex = signature + coder.encodeParams(types, args);
+        const encodedData = '0x' + dataHex;
 
-            // Encode the transaction data
-            const encodedData = contract.methods.setData(data).encodeABI();
+        // Build the transaction object
+        const nonce = await web3.eth.getTransactionCount(account);
+        const gasPrice = await web3.eth.getGasPrice();
+        const gasLimit = 300000; // user defined
+        const txObject = {
+            nonce: web3.utils.toHex(nonce),
+            gasPrice: web3.utils.toHex(gasPrice),
+            gasLimit: web3.utils.toHex(gasLimit),
+            from: account,
+            to: contractAddress,
+            data: encodedData
+        };
 
-            // Construct the transaction object
-            const txParams = {
-                from: from,
-                to: contractAddress,
-                gas: await web3.eth.estimateGas({
-                    to: contractAddress,
-                    data: encodedData
-                }),
-                data: encodedData,
-                value: '0x00', // Set value to 0 if not sending ETH
-                nonce: await web3.eth.getTransactionCount(from, 'latest'),
-                chainId: 1 // Use the correct chainId for the Ethereum mainnet
-            };
+        // Sign the transaction
+        const tx = new Tx(txObject, { 'chain': 'ropsten', 'hardfork': 'petersburg' });
+        const privateKeyBuffer = Buffer.from(privateKey, 'hex');
+        tx.sign(privateKeyBuffer);
+        const serializedTx = '0x' + tx.serialize().toString('hex');
 
-            // Sign and send the transaction using MetaMask
-            await ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [txParams],
-            });
-
-            console.log('Transaction sent.');
-
-        } else {
-            console.error('MetaMask is not detected.');
-        }
+        // Send the signed transaction
+        web3.eth.sendSignedTransaction(serializedTx, function (err, txHash) {
+            if (!err) {
+                console.log('Transaction hash:', txHash);
+            } else {
+                console.error('Error sending transaction:', err);
+            }
+        });
     } catch (error) {
-        console.error('Error:', error);
+        console.error('Error setting data:', error);
     }
 }
 
