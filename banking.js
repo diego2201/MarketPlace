@@ -36,6 +36,8 @@ const contractABI = [
 // Initialize Web3
 const web3 = new Web3(infuraUrl);
 
+//tewtweyufrgwerf
+
 async function connectMetamask() {
     if (window.ethereum) {
         try {
