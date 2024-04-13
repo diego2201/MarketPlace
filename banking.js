@@ -57,44 +57,39 @@ async function retrieveDataFromContract() {
 }
 
 // Function to set data in the contract using MetaMask
-async function setDataInContract(data, from) {
+// Function to set data in the contract using personal_sign
+async function setDataInContract(data) {
     try {
-        // Check if MetaMask is installed and enabled
-        if (!window.ethereum) {
-            throw new Error('MetaMask is not detected.');
+        if (window.ethereum) {
+            // Request access to MetaMask accounts
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const from = accounts[0];
+
+            // Convert the message to sign into hex-encoded UTF-8
+            const encoder = new TextEncoder();
+            const msgUint8 = encoder.encode(data);
+            const msgHex = Array.prototype.map.call(msgUint8, x => ('00' + x.toString(16)).slice(-2)).join('');
+            const msg = `0x${msgHex}`;
+
+            // Request personal_sign method from MetaMask
+            const signature = await ethereum.request({
+                method: "personal_sign",
+                params: [msg, from],
+            });
+
+            // Now you have the signature, you can proceed with sending the transaction or storing it as needed
+            console.log('Signature:', signature);
+
+            // Proceed with sending the transaction or other operations
+            
+        } else {
+            console.error('MetaMask is not detected.');
         }
-
-        // Prompt user to connect their MetaMask account
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        // Get the first account from MetaMask
-        const from = accounts[0];
-
-        // Encode the transaction data
-        const encodedData = contract.methods.setData(data).encodeABI();
-
-        // Build the transaction object
-        const txObject = {
-            from: from,
-            to: contractAddress,
-            gas: await web3.eth.estimateGas({
-                to: contractAddress,
-                data: encodedData
-            }),
-            data: encodedData
-        };
-
-        // Request user to sign the transaction using MetaMask
-        const result = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txObject]
-        });
-
-        console.log('Transaction successful:', result);
     } catch (error) {
-        console.error('Error setting data:', error);
+        console.error('Error:', error);
     }
 }
+
 
 
 
