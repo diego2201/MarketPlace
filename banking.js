@@ -146,7 +146,7 @@ async function setDataInContract(data) {
                 chainId: 1 // Use the correct chainId for the Ethereum mainnet
             };
 
-            // Send the signed transaction using MetaMask
+            // Sign and send the transaction using MetaMask
             await ethereum.request({
                 method: 'eth_sendTransaction',
                 params: [txParams],
