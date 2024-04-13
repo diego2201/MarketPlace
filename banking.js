@@ -98,25 +98,35 @@ async function checkContractValidity(contractAddress) {
     }
 }
 
+// Function to connect to Metamask
 async function connectMetamask() {
     try {
-        // Request access to Metamask
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const address = accounts[0];
-        // Update the HTML to display wallet address
-        document.getElementById('walletAddress').textContent = `Wallet Address: ${address}`;
-        // Get the wallet balance
-        const balance = await getWalletBalance(address);
-        // Update the HTML to display wallet balance
-        document.getElementById('walletBalance').textContent = `Wallet Balance: ${balance} ETH`;
+        // Check if MetaMask is installed
+        if (window.ethereum) {
+            // Request account access
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const address = accounts[0];
+            document.getElementById('walletAddress').textContent = `Wallet Address: ${address}`;
+            // Get wallet balance
+            const balance = await getWalletBalance(address);
+            document.getElementById('walletBalance').textContent = `Wallet Balance: ${balance} ETH`;
+        } else {
+            console.error('Metamask not detected or installed.');
+        }
     } catch (error) {
         console.error('Error connecting to Metamask:', error);
     }
 }
 
+// Function to get wallet balance
 async function getWalletBalance(address) {
-    // Fetch wallet balance from Metamask
-    const balance = await window.ethereum.request({ method: 'eth_getBalance', params: [address] });
-    // Convert balance from Wei to Ether
-    return window.web3.utils.fromWei(balance, 'ether');
+    try {
+        // Get wallet balance in Ether
+        const weiBalance = await web3.eth.getBalance(address);
+        const balance = web3.utils.fromWei(weiBalance, 'ether');
+        return balance;
+    } catch (error) {
+        console.error('Error getting wallet balance:', error);
+        return null;
+    }
 }
