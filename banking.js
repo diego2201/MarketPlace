@@ -40,8 +40,12 @@ const contractAddress = '0xB41cfBE072d0AA695e737e17F6Cd9E44F095408c';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 // Function to set data in the contract
-async function setDataInContract(data, from) {
+async function setDataInContract(data) {
     try {
+        // Get the user's accounts from MetaMask
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const from = accounts[0]; // Use the first account
+        
         // Send transaction to the contract to set data
         await contract.methods.setData(data).send({ from: from });
         console.log('Data set successfully:', data);
@@ -106,5 +110,3 @@ async function requestAccountsAndSetData(data) {
         console.error('Error:', error);
     }
 }
-
-

@@ -14,6 +14,12 @@
     <!-- Button to connect Metamask -->
     <button onclick="connectMetamask()">Connect Metamask</button>
     
+    <!-- Display connected account address -->
+    <div id="accountAddress"></div>
+    
+    <!-- Display connected account balance -->
+    <div id="accountBalance"></div>
+    
     <!-- Button to trigger the request to Infura -->
     <button onclick="sendRequestToInfura()">Get Latest Block Number</button>
     
@@ -36,12 +42,24 @@
                     // Request access to Metamask accounts
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                     console.log('Connected to Metamask:', accounts);
+                    displayAccountInfo(accounts[0]);
                 } catch (error) {
                     console.error('Error connecting to Metamask:', error);
                 }
             } else {
                 console.error('Metamask not detected or installed.');
             }
+        }
+
+        async function displayAccountInfo(account) {
+            // Display connected account address
+            document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
+
+            // Get account balance
+            const balance = await web3.eth.getBalance(account);
+            // Convert balance to ether and display
+            const balanceInEther = web3.utils.fromWei(balance, 'ether');
+            document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
         }
     </script>
     
