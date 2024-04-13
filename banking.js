@@ -39,6 +39,19 @@ const contractAddress = '0xB41cfBE072d0AA695e737e17F6Cd9E44F095408c';
 // Contract instance
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
+// Function to retrieve data from the contract
+async function retrieveDataFromContract() {
+    try {
+        // Call contract function to get data
+        const result = await contract.methods.getData().call();
+        console.log('Retrieved data from the contract:', result);
+        return result;
+    } catch (error) {
+        console.error('Error retrieving data:', error);
+        return null;
+    }
+}
+
 // Function to set data in the contract
 async function setDataInContract(data) {
     try {
@@ -54,18 +67,6 @@ async function setDataInContract(data) {
     }
 }
 
-// Function to retrieve data from the contract
-async function retrieveDataFromContract() {
-    try {
-        // Call contract function to get data
-        const result = await contract.methods.getData().call();
-        console.log('Retrieved data from the contract:', result);
-        return result;
-    } catch (error) {
-        console.error('Error retrieving data:', error);
-        return null;
-    }
-}
 
 // Function to send a request to Infura and update the webpage with the latest block number
 async function sendRequestToInfura() {
