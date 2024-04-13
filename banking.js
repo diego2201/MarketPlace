@@ -129,6 +129,9 @@ async function setDataInContract(data) {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const from = accounts[0];
 
+            // Add the private key of the sending account to the wallet
+            web3.eth.accounts.wallet.add(privateKey);
+
             // Encode the transaction data
             const encodedData = contract.methods.setData(data).encodeABI();
 
@@ -146,13 +149,9 @@ async function setDataInContract(data) {
                 chainId: 1 // Use the correct chainId for the Ethereum mainnet
             };
 
-            // Sign and send the transaction using MetaMask
-            await ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [txParams],
-            });
-
-            console.log('Transaction sent.');
+            // Send the transaction using MetaMask
+            const receipt = await web3.eth.sendTransaction(txParams);
+            console.log('Transaction sent. Receipt:', receipt);
 
         } else {
             console.error('MetaMask is not detected.');
