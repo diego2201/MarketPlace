@@ -123,6 +123,7 @@ async function retrieveDataFromContract() {
 // }
 
 // Function to set data in the contract
+// Function to set data in the contract
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
@@ -145,15 +146,12 @@ async function setDataInContract(data) {
             };
 
             // Sign the transaction locally using MetaMask
-            const signedTx = await ethereum.request({
-                method: "eth_signTransaction",
+            const signedTx = await window.ethereum.request({
+                method: "eth_sendTransaction",
                 params: [txObject],
             });
 
-            // Send the signed transaction to Infura
-            const receipt = await web3.eth.sendSignedTransaction(signedTx.raw);
-
-            console.log('Transaction sent:', receipt);
+            console.log('Transaction sent:', signedTx);
 
         } else {
             console.error('MetaMask is not detected.');
@@ -162,6 +160,8 @@ async function setDataInContract(data) {
         console.error('Error:', error);
     }
 }
+
+
 
 
 
