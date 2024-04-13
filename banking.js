@@ -129,17 +129,8 @@ async function setDataInContract(data) {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const from = accounts[0];
 
-            // Convert the message to sign into hex-encoded UTF-8
-            const encoder = new TextEncoder();
-            const msgUint8 = encoder.encode(data);
-            const msgHex = Array.prototype.map.call(msgUint8, x => ('00' + x.toString(16)).slice(-2)).join('');
-            const msg = `0x${msgHex}`;
-
-            // Request personal_sign method from MetaMask
-            const signature = await ethereum.request({
-                method: "personal_sign",
-                params: [msg, from],
-            });
+            // Encode the transaction data
+            const encodedData = contract.methods.setData(data).encodeABI();
 
             // Construct the transaction object
             const txParams = {
