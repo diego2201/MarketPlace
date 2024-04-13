@@ -1,9 +1,7 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
-//const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
+const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
-
-//test
 
 // Contract ABI
 const contractABI = [
@@ -56,26 +54,15 @@ async function retrieveDataFromContract() {
     }
 }
 
-// Function to set data in the contract using MetaMask
-async function setDataInContract(data, from) {
+// Function to set data in the contract
+async function setDataInContract(data) {
     try {
-        // Check if MetaMask is installed and enabled
-        if (!window.ethereum) {
-            throw new Error('MetaMask is not detected.');
-        }
-
-        // Prompt user to connect their MetaMask account
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-
-        // Get the first account from MetaMask
-        const from = accounts[0];
-
         // Encode the transaction data
         const encodedData = contract.methods.setData(data).encodeABI();
 
         // Build the transaction object
         const txObject = {
-            from: from,
+            from: account,
             to: contractAddress,
             gas: await web3.eth.estimateGas({
                 to: contractAddress,
@@ -84,13 +71,14 @@ async function setDataInContract(data, from) {
             data: encodedData
         };
 
-        // Request user to sign the transaction using MetaMask
-        const result = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txObject]
-        });
+        // Sign the transaction
+        const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
 
-        console.log('Transaction successful:', result);
+        // Send the signed transaction
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+
+        console.log('Data set successfully:', data);
+        console.log('Transaction receipt:', receipt);
     } catch (error) {
         console.error('Error setting data:', error);
     }
@@ -127,7 +115,6 @@ async function setDataInContract(data, from) {
 //         console.error('Error:', error);
 //     }
 // }
-
 
 
 // Function to send a request to Infura and update the webpage with the latest block number
