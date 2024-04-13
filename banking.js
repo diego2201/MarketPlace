@@ -121,6 +121,7 @@ async function retrieveDataFromContract() {
 //         console.error('Error:', error);
 //     }
 // }
+
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
@@ -141,23 +142,26 @@ async function setDataInContract(data) {
             });
 
             // Construct the transaction object
-            const txObject = {
+            const txParams = {
                 from: from,
                 to: contractAddress,
                 gas: await web3.eth.estimateGas({
                     to: contractAddress,
                     data: encodedData
                 }),
-                data: encodedData
+                data: encodedData,
+                value: '0x00', // Set value to 0 if not sending ETH
+                nonce: await web3.eth.getTransactionCount(from, 'latest'),
+                chainId: 1 // Use the correct chainId for the Ethereum mainnet
             };
 
-            // Add the signature to the transaction object
-            txObject['signature'] = signature;
+            // Send the signed transaction using MetaMask
+            await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [txParams],
+            });
 
-            // Send the signed transaction
-            const receipt = await web3.eth.sendTransaction(txObject);
-
-            console.log('Transaction sent. Receipt:', receipt);
+            console.log('Transaction sent.');
 
         } else {
             console.error('MetaMask is not detected.');
@@ -166,6 +170,7 @@ async function setDataInContract(data) {
         console.error('Error:', error);
     }
 }
+
 
 
 
