@@ -1,9 +1,6 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
 const web3 = new Web3(infuraUrl);
 
-// Ethereum account
-const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Replace this with your actual Ethereum address
-
 // Contract ABI
 const contractABI = [
     {
@@ -42,12 +39,9 @@ const contractAddress = '0xB41cfBE072d0AA695e737e17F6Cd9E44F095408c';
 // Contract instance
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-async function setDataInContract(data) {
+// Function to set data in the contract
+async function setDataInContract(data, from) {
     try {
-        // Get the user's accounts from MetaMask
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const from = accounts[0]; // Use the first account
-        
         // Send transaction to the contract to set data
         await contract.methods.setData(data).send({ from: from });
         console.log('Data set successfully:', data);
@@ -55,7 +49,6 @@ async function setDataInContract(data) {
         console.error('Error setting data:', error);
     }
 }
-
 
 // Function to retrieve data from the contract
 async function retrieveDataFromContract() {
@@ -96,5 +89,20 @@ async function checkContractValidity(contractAddress) {
         }
     } catch (error) {
         console.error('Error checking contract validity:', error);
+    }
+}
+
+// Function to request access to MetaMask accounts and then call setDataInContract
+async function requestAccountsAndSetData(data) {
+    try {
+        if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const from = accounts[0];
+            await setDataInContract(data, from);
+        } else {
+            console.error('MetaMask is not detected.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
     }
 }
