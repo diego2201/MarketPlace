@@ -90,6 +90,41 @@ async function retrieveDataFromContract() {
 //     }
 // }
 
+// async function setDataInContract(data) {
+//     try {
+//         if (window.ethereum) {
+//             // Request access to MetaMask accounts
+//             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+//             const from = accounts[0];
+
+//             // Convert the message to sign into hex-encoded UTF-8
+//             const encoder = new TextEncoder();
+//             const msgUint8 = encoder.encode(data);
+//             const msgHex = Array.prototype.map.call(msgUint8, x => ('00' + x.toString(16)).slice(-2)).join('');
+//             const msg = `0x${msgHex}`;
+
+//             // Request personal_sign method from MetaMask
+//             const signature = await ethereum.request({
+//                 method: "personal_sign",
+//                 params: [msg, from],
+//             });
+
+//             // Now you have the signature, you can proceed with sending the transaction or storing it as needed
+//             console.log('Signature:', signature);
+
+//             // Proceed with sending the transaction or other operations
+
+            
+//         } else {
+//             console.error('MetaMask is not detected.');
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
+
+
+
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
@@ -97,24 +132,27 @@ async function setDataInContract(data) {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const from = accounts[0];
 
-            // Convert the message to sign into hex-encoded UTF-8
-            const encoder = new TextEncoder();
-            const msgUint8 = encoder.encode(data);
-            const msgHex = Array.prototype.map.call(msgUint8, x => ('00' + x.toString(16)).slice(-2)).join('');
-            const msg = `0x${msgHex}`;
+            // Prepare the transaction object
+            const txObject = {
+                from: from,
+                to: contractAddress,
+                gas: await web3.eth.estimateGas({
+                    to: contractAddress,
+                    data: encodedData
+                }),
+                data: encodedData
+            };
 
-            // Request personal_sign method from MetaMask
+            // Prompt user to sign the transaction
             const signature = await ethereum.request({
                 method: "personal_sign",
-                params: [msg, from],
+                params: [JSON.stringify(txObject), from], // Signing the transaction object
             });
 
-            // Now you have the signature, you can proceed with sending the transaction or storing it as needed
-            console.log('Signature:', signature);
+            // Send the signed transaction to Infura
+            const transactionHash = await web3.eth.sendSignedTransaction(signature.raw);
 
-            // Proceed with sending the transaction or other operations
-
-            
+            console.log('Transaction sent. Hash:', transactionHash);
         } else {
             console.error('MetaMask is not detected.');
         }
