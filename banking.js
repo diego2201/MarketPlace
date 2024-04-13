@@ -59,11 +59,9 @@ async function setDataInContract(data) {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const from = accounts[0]; // Use the first account
         
-        // Estimate gas required for the transaction
-        const gas = await contract.methods.setData(data).estimateGas({ from });
+        // Prompt user to confirm transaction using MetaMask
+        await contract.methods.setData(data).send({ from });
 
-        // Send transaction to the contract to set data
-        await contract.methods.setData(data).send({ from, gas });
         console.log('Data set successfully:', data);
     } catch (error) {
         console.error('Error setting data:', error);
