@@ -1,5 +1,4 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
-
 const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
@@ -58,9 +57,6 @@ async function retrieveDataFromContract() {
 // Function to set data in the contract
 async function setDataInContract(data) {
     try {
-        // Instantiate the contract
-        const contract = new web3.eth.Contract(contractABI, contractAddress);
-
         // Encode the transaction data
         const encodedData = contract.methods.setData(data).encodeABI();
 
@@ -87,8 +83,6 @@ async function setDataInContract(data) {
         console.error('Error setting data:', error);
     }
 }
-
-
 
 // Function to send a request to Infura and update the webpage with the latest block number
 async function sendRequestToInfura() {
