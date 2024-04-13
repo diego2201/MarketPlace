@@ -55,14 +55,15 @@ async function retrieveDataFromContract() {
 }
 
 // Function to set data in the contract
-async function setDataInContract(data) {
+// Function to set data in the contract
+async function setDataInContract(data, from) {
     try {
         // Encode the transaction data
         const encodedData = contract.methods.setData(data).encodeABI();
 
         // Build the transaction object
         const txObject = {
-            from: account,
+            from: from,
             to: contractAddress,
             gas: await web3.eth.estimateGas({
                 to: contractAddress,
@@ -71,18 +72,18 @@ async function setDataInContract(data) {
             data: encodedData
         };
 
-        // Sign the transaction
-        const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
+        // Request user to sign the transaction using MetaMask
+        const result = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txObject]
+        });
 
-        // Send the signed transaction
-        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
-
-        console.log('Data set successfully:', data);
-        console.log('Transaction receipt:', receipt);
+        console.log('Transaction successful:', result);
     } catch (error) {
         console.error('Error setting data:', error);
     }
 }
+
 
 // Function to send a request to Infura and update the webpage with the latest block number
 async function sendRequestToInfura() {
