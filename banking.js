@@ -4,7 +4,7 @@ const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the acco
 const web3 = new Web3(infuraUrl);
 
 //test1
-//sdwed
+//sdwedwedw
 
 // Contract ABI
 const contractABI = [
