@@ -127,41 +127,35 @@ async function retrieveDataFromContract() {
 async function setDataInContract(data) {
     try {
         // Encode the transaction data
-        const encoder = new TextEncoder();
         const types = ['uint', 'bytes32', 'bytes20', 'bytes5', 'bytes'];
         const args = [1, data, '03:00:21 12-12-12', 'true', ''];
         const fullName = 'addRecord' + '(' + types.join() + ')';
         const signature = CryptoJS.SHA3(fullName, { outputLength: 256 }).toString(CryptoJS.enc.Hex).slice(0, 8);
-        const dataHex = signature + coder.encodeParams(types, args);
+        const dataHex = signature + web3.eth.abi.encodeParameters(types, args).slice(2); // Remove '0x' prefix
         const encodedData = '0x' + dataHex;
 
         // Build the transaction object
         const nonce = await web3.eth.getTransactionCount(account);
         const gasPrice = await web3.eth.getGasPrice();
-        const gasLimit = 300000; // user defined
+        const gasLimit = 300000; // User-defined gas limit
         const txObject = {
             nonce: web3.utils.toHex(nonce),
             gasPrice: web3.utils.toHex(gasPrice),
             gasLimit: web3.utils.toHex(gasLimit),
-            from: account,
             to: contractAddress,
             data: encodedData
         };
 
         // Sign the transaction
-        const tx = new Tx(txObject, { 'chain': 'ropsten', 'hardfork': 'petersburg' });
+        const tx = new Tx(txObject, { chain: 'ropsten', hardfork: 'petersburg' });
         const privateKeyBuffer = Buffer.from(privateKey, 'hex');
         tx.sign(privateKeyBuffer);
-        const serializedTx = '0x' + tx.serialize().toString('hex');
+        const serializedTx = tx.serialize();
 
         // Send the signed transaction
-        web3.eth.sendSignedTransaction(serializedTx, function (err, txHash) {
-            if (!err) {
-                console.log('Transaction hash:', txHash);
-            } else {
-                console.error('Error sending transaction:', err);
-            }
-        });
+        const receipt = await web3.eth.sendSignedTransaction('0x' + serializedTx.toString('hex'));
+        console.log('Data set successfully:', data);
+        console.log('Transaction receipt:', receipt);
     } catch (error) {
         console.error('Error setting data:', error);
     }
