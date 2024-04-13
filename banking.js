@@ -1,5 +1,5 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
-const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
+//const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
 
@@ -129,9 +129,6 @@ async function setDataInContract(data) {
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
             const from = accounts[0];
 
-            // Add the private key of the sending account to the wallet
-            web3.eth.accounts.wallet.add(privateKey);
-
             // Encode the transaction data
             const encodedData = contract.methods.setData(data).encodeABI();
 
@@ -150,9 +147,15 @@ async function setDataInContract(data) {
             };
 
             // Send the transaction using MetaMask
-            const receipt = await web3.eth.sendTransaction(txParams);
-            console.log('Transaction sent. Receipt:', receipt);
+            const txHash = await window.ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [txParams],
+            });
+            console.log('Transaction sent. Hash:', txHash);
 
+            // Wait for transaction confirmation
+            const receipt = await waitForTxConfirmation(txHash);
+            console.log('Transaction confirmed. Receipt:', receipt);
         } else {
             console.error('MetaMask is not detected.');
         }
@@ -160,6 +163,24 @@ async function setDataInContract(data) {
         console.error('Error:', error);
     }
 }
+
+async function waitForTxConfirmation(txHash) {
+    return new Promise((resolve, reject) => {
+        const intervalId = setInterval(async () => {
+            try {
+                const receipt = await web3.eth.getTransactionReceipt(txHash);
+                if (receipt) {
+                    clearInterval(intervalId);
+                    resolve(receipt);
+                }
+            } catch (error) {
+                clearInterval(intervalId);
+                reject(error);
+            }
+        }, 3000); // Check every 3 seconds
+    });
+}
+
 
 
 
