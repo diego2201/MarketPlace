@@ -11,9 +11,6 @@
     <!-- Include your JavaScript file -->
     <script src="banking.js"></script>
 
-    <!-- Button to connect Metamask -->
-    <button onclick="connectMetamask()">Connect Metamask</button>
-    
     <!-- Button to trigger the request to Infura -->
     <button onclick="sendRequestToInfura()">Get Latest Block Number</button>
     
@@ -29,21 +26,13 @@
     <!-- Button to retrieve data from contract -->
     <button onclick="retrieveDataFromContract()">Retrieve Data from Contract</button>
 
-    <script>
-        async function connectMetamask() {
-            if (window.ethereum) {
-                try {
-                    // Request access to Metamask accounts
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    console.log('Connected to Metamask:', accounts);
-                } catch (error) {
-                    console.error('Error connecting to Metamask:', error);
-                }
-            } else {
-                console.error('Metamask not detected or installed.');
-            }
-        }
-    </script>
-    
+    <!-- Button to connect to Metamask -->
+    <button onclick="connectMetamask()">Connect Metamask</button>
+
+    <!-- Placeholder element to display wallet address -->
+    <div id="walletAddress"></div>
+
+    <!-- Placeholder element to display wallet balance -->
+    <div id="walletBalance"></div>
 </body>
 </html>
