@@ -54,10 +54,20 @@ async function retrieveDataFromContract() {
     }
 }
 
-// Function to set data in the contract
-// Function to set data in the contract
+// Function to set data in the contract using MetaMask
 async function setDataInContract(data, from) {
     try {
+        // Check if MetaMask is installed and enabled
+        if (!window.ethereum) {
+            throw new Error('MetaMask is not detected.');
+        }
+
+        // Prompt user to connect their MetaMask account
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Get the first account from MetaMask
+        const from = accounts[0];
+
         // Encode the transaction data
         const encodedData = contract.methods.setData(data).encodeABI();
 
@@ -83,6 +93,7 @@ async function setDataInContract(data, from) {
         console.error('Error setting data:', error);
     }
 }
+
 
 
 // Function to send a request to Infura and update the webpage with the latest block number
