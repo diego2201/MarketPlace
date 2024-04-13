@@ -3,7 +3,7 @@ const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
 
-//test
+//test1
 
 // Contract ABI
 const contractABI = [
