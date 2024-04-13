@@ -146,16 +146,17 @@ async function setDataInContract(data) {
                 chainId: 1 // Use the correct chainId for the Ethereum mainnet
             };
 
-            // Send the transaction using MetaMask
-            const txHash = await window.ethereum.request({
-                method: 'eth_sendTransaction',
+            // Sign the transaction
+            const signedTx = await ethereum.request({
+                method: "eth_signTransaction",
                 params: [txParams],
             });
-            console.log('Transaction sent. Hash:', txHash);
 
-            // Wait for transaction confirmation
-            const receipt = await waitForTxConfirmation(txHash);
-            console.log('Transaction confirmed. Receipt:', receipt);
+            // Send the signed transaction
+            const receipt = await web3.eth.sendSignedTransaction(signedTx.raw);
+
+            console.log('Data set successfully:', data);
+            console.log('Transaction receipt:', receipt);
         } else {
             console.error('MetaMask is not detected.');
         }
@@ -163,24 +164,6 @@ async function setDataInContract(data) {
         console.error('Error:', error);
     }
 }
-
-async function waitForTxConfirmation(txHash) {
-    return new Promise((resolve, reject) => {
-        const intervalId = setInterval(async () => {
-            try {
-                const receipt = await web3.eth.getTransactionReceipt(txHash);
-                if (receipt) {
-                    clearInterval(intervalId);
-                    resolve(receipt);
-                }
-            } catch (error) {
-                clearInterval(intervalId);
-                reject(error);
-            }
-        }, 3000); // Check every 3 seconds
-    });
-}
-
 
 
 
