@@ -53,6 +53,8 @@ async function retrieveDataFromContract() {
     }
 }
 
+
+//send data
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
