@@ -53,11 +53,9 @@ async function retrieveDataFromContract() {
     }
 }
 
-// Function to set data in the contract
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
-            // Encode the transaction data
             const encodedData = contract.methods.setData(data).encodeABI();
 
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -68,20 +66,19 @@ async function setDataInContract(data) {
                 from: from,
                 to: contractAddress,
                 gas: await web3.eth.estimateGas({
+                    from: from,
                     to: contractAddress,
                     data: encodedData
                 }),
+                gasPrice: await web3.eth.getGasPrice(),
                 data: encodedData
             };
 
-            // Prompt user to sign the transaction
-            const signature = await ethereum.request({
-                method: "personal_sign",
-                params: [JSON.stringify(txObject), from], // Signing the transaction object
+            // Send the transaction via MetaMask
+            const transactionHash = await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [txObject],
             });
-
-            // Send the signed transaction to Infura
-            const transactionHash = await web3.eth.sendSignedTransaction('0x' + signature.raw);
 
             console.log('Transaction sent. Hash:', transactionHash);
         } else {
