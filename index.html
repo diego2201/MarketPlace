@@ -13,6 +13,10 @@
         <div class="connection-status">
             <button onclick="connectMetamask()" class="metamask-button"></button> <!-- Right-aligned button with MetaMask symbol -->
             <span id="connection-text">Not connected</span> <!-- Text to display connection status -->
+            <!-- Display connected account address -->
+            <div id="accountAddress"></div>
+            <!-- Display connected account balance -->
+            <div id="accountBalance"></div>
         </div>
     </div>
 
@@ -21,17 +25,11 @@
     <!-- Include your JavaScript file -->
     <script src="banking.js"></script>
 
-    <!-- Display connected account address -->
-    <div id="accountAddress"></div>
-    
-    <!-- Display connected account balance -->
-    <div id="accountBalance"></div>
-    
-    <!-- Button to trigger the request to Infura -->
-    <button onclick="sendRequestToInfura()">Get Latest Block Number</button>
-    
     <!-- Placeholder element to display the latest block number -->
     <div id="latestBlockNumber"></div>
+
+    <!-- Button to trigger the request to Infura -->
+    <button onclick="sendRequestToInfura()">Get Latest Block Number</button>
 
     <!-- Button to check contract validity -->
     <button onclick="checkContractValidity(contractAddress)">Check Contract Validity</button>
