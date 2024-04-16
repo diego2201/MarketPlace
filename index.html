@@ -13,6 +13,8 @@
         <div class="connection-status">
             <button onclick="connectMetamask()" class="metamask-button"></button> <!-- Right-aligned button with MetaMask symbol -->
             <span id="connection-text">Not connected</span> <!-- Text to display connection status -->
+            <!-- Display connected account address -->
+            <div id="accountAddress"></div>
         </div>
     </div>
     
@@ -63,6 +65,8 @@
             // Convert balance to ether and display
             const balanceInEther = web3.utils.fromWei(balance, 'ether');
             document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
+            // Display connected account address
+            document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
         }
     </script>
     
