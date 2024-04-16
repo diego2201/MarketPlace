@@ -3,19 +3,19 @@
     color: white;
     padding: 10px;
     display: flex; /* Use flexbox for layout */
-    flex-direction: column; /* Change flex direction to column */
-    justify-content: center; /* Align items vertically */
-    align-items: center; /* Center items horizontally */
+    flex-direction: row; /* Change flex direction to row */
+    justify-content: space-between; /* Align items with space between them */
+    align-items: center; /* Center items vertically */
 }
 
 .banner h1 {
     margin: 0; /* Remove default margin for the h1 element */
+    text-align: left; /* Align text to the left */
 }
 
 .connection-status {
     display: flex;
-    flex-direction: column; /* Change flex direction to column */
-    align-items: center; /* Center items horizontally */
+    align-items: center; /* Center items vertically */
 }
 
 .metamask-button {
@@ -27,9 +27,19 @@
     height: 30px;
     border: none; /* Remove button border */
     cursor: pointer; /* Change cursor to pointer on hover */
-    margin-bottom: 5px; /* Add margin between button and text */
+    margin-right: 5px; /* Add margin between button and text */
 }
 
 #accountBalance {
-    margin-top: 5px; /* Add margin between button and balance */
+    display: flex;
+    align-items: center; /* Center items vertically */
+    margin-top: 0px; /* Add margin between button and balance */
+    text-align: right; /* Align text to the right */
+    flex-grow: 1; /* Allow the balance to take up remaining space */
+}
+
+#accountBalance img {
+    width: 30px; /* Adjust logo width */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 5px; /* Add margin between logo and balance text */
 }
