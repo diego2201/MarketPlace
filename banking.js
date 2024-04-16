@@ -1,6 +1,7 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
+//const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
-let isConnectedToMetamask = false; // Track MetaMask connection status
+const web3 = new Web3(infuraUrl);
 
 // Contract ABI
 const contractABI = [
@@ -53,14 +54,12 @@ async function retrieveDataFromContract() {
     }
 }
 
+
 //Function to set data in the contract
 async function setDataInContract(data) {
     try {
-        if (!isConnectedToMetamask) {
-            console.error('Please connect to MetaMask first.');
-            return;
-        }
         // Encode the transaction data
+        const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
         const encodedData = contract.methods.setData(data).encodeABI();
 
         // Build the transaction object
@@ -75,10 +74,13 @@ async function setDataInContract(data) {
         };
 
         // Sign the transaction
-        const signedTx = await web3.eth.sendTransaction(txObject);
+        const signedTx = await web3.eth.accounts.signTransaction(txObject, privateKey);
+
+        // Send the signed transaction
+        const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
 
         console.log('Data set successfully:', data);
-        console.log('Transaction receipt:', signedTx);
+        console.log('Transaction receipt:', receipt);
     } catch (error) {
         console.error('Error setting data:', error);
     }
@@ -116,68 +118,51 @@ async function checkContractValidity(contractAddress) {
 // Function to request access to MetaMask accounts and then call setDataInContract
 async function requestAccountsAndSetData(data) {
     try {
-        if (!isConnectedToMetamask) {
-            console.error('Please connect to MetaMask first.');
-            return;
+        if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const from = accounts[0];
+            await setDataInContract(data, from);
+        } else {
+            console.error('MetaMask is not detected.');
         }
-        await setDataInContract(data);
     } catch (error) {
         console.error('Error:', error);
     }
 }
 
-// Function to connect/disconnect MetaMask
-async function toggleConnection() {
-    if (!isConnectedToMetamask) {
-        try {
+
+async function setDataInContract(data) {
+    try {
+        if (window.ethereum) {
+            // Request access to MetaMask accounts
+            const encodedData = contract.methods.setData(data).encodeABI();
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            console.log('Connected to MetaMask:', accounts);
-            isConnectedToMetamask = true;
-            displayConnectionStatus('Connected');
-            displayAccountInfo(accounts[0]);
-        } catch (error) {
-            console.error('Error connecting to MetaMask:', error);
-        }
-    } else {
-        // Disconnect MetaMask
-        await window.ethereum.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
-        isConnectedToMetamask = false;
-        displayConnectionStatus('Not connected');
-        console.log('Disconnected from MetaMask');
-    }
-}
+            const from = accounts[0];
 
-// Function to display connection status
-function displayConnectionStatus(status) {
-    document.getElementById('connection-text').textContent = status;
-}
+            // Convert the message to sign into hex-encoded UTF-8
+            const encoder = new TextEncoder();
+            const msgUint8 = encoder.encode(data);
+            const msgHex = Array.prototype.map.call(msgUint8, x => ('00' + x.toString(16)).slice(-2)).join('');
+            const msg = `0x${msgHex}`;
 
-// Function to display account info
-async function displayAccountInfo(account) {
-    // Display connected account address
-    document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
+            // Request personal_sign method from MetaMask
+            const signature = await ethereum.request({
+                method: "personal_sign",
+                params: [msg, from],
+            });
 
-    // Get account balance
-    const balance = await web3.eth.getBalance(account);
-    // Convert balance to ether and display
-    const balanceInEther = web3.utils.fromWei(balance, 'ether');
-    document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
-}
+            // Now you have the signature, you can proceed with sending the transaction or storing it as needed
+            console.log('Signature:', signature);
 
-// Initial check if MetaMask is connected
-if (window.ethereum) {
-    window.ethereum.on('accountsChanged', function (accounts) {
-        if (accounts.length === 0) {
-            isConnectedToMetamask = false;
-            displayConnectionStatus('Not connected');
-            console.log('Disconnected from MetaMask');
+            // Proceed with sending the transaction or other operations
+
+            
         } else {
-            isConnectedToMetamask = true;
-            displayConnectionStatus('Connected');
-            console.log('Connected to MetaMask:', accounts);
-            displayAccountInfo(accounts[0]);
+            console.error('MetaMask is not detected.');
         }
-    });
+    } catch (error) {
+        console.error('Error:', error);
+    }
 }
 
 
