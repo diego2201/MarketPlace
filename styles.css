@@ -27,8 +27,3 @@
     cursor: pointer; /* Change cursor to pointer on hover */
     margin-right: 5px; /* Add margin between button and text */
 }
-
-#accountAddress,
-#accountBalance {
-    margin-left: 10px; /* Add margin between MetaMask button and account info */
-}
