@@ -19,9 +19,11 @@
     <!-- Second Banner -->
     <div class="banner">
         <div class="account-info">
+            <img src="eth_logo.png" alt="Account Image"> <!-- Image for the account -->
             <span id="accountBalance"></span> <!-- Display connected account balance -->
         </div>
     </div>
+
 
     <!-- Include the Web3 library -->
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
@@ -68,7 +70,7 @@
             const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
             document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
             // Display connected account address
-            document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
+            // document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
         }
     </script>
     
