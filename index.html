@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css"> <!-- Include the external CSS file -->
 </head>
 <body>
-    <!-- First Banner -->
+    <!-- Banner -->
     <div class="banner">
         <h1>Web3 Request Website</h1> <!-- Left-aligned name -->
         <div class="connection-status">
@@ -19,11 +19,10 @@
     <!-- Second Banner -->
     <div class="banner">
         <div class="account-info">
-            <img src="eth_logo.png" alt="Account Image" style="width: 30px; height: 30px;"> <!-- Image for the account -->
+            <img src="eth_logo.png" alt="Ethereum Logo" class="account-image"> <!-- Ethereum Logo -->
             <span id="accountBalance"></span> <!-- Display connected account balance -->
         </div>
     </div>
-
 
     <!-- Include the Web3 library -->
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
@@ -68,9 +67,9 @@
             const balance = await web3.eth.getBalance(account);
             // Convert balance to ether and display with four decimal points
             const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
-            document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
+            document.getElementById('accountBalance').textContent = `${balanceInEther} ETH`; // Update account balance text
             // Display connected account address
-            // document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
+            document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
         }
     </script>
     
