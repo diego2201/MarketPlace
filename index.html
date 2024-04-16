@@ -7,18 +7,21 @@
     <link rel="stylesheet" href="styles.css"> <!-- Include the external CSS file -->
 </head>
 <body>
-    <!-- Banner -->
+    <!-- First Banner -->
     <div class="banner">
         <h1>Web3 Request Website</h1> <!-- Left-aligned name -->
         <div class="connection-status">
             <button onclick="connectMetamask()" class="metamask-button"></button> <!-- Right-aligned button with MetaMask symbol -->
             <span id="connection-text">Not connected</span> <!-- Text to display connection status -->
         </div>
-        <div id="accountBalance"></div>
     </div>
 
-    <!-- Display connected account balance -->
-    
+    <!-- Second Banner -->
+    <div class="banner">
+        <div class="account-info">
+            <span id="accountBalance"></span> <!-- Display connected account balance -->
+        </div>
+    </div>
 
     <!-- Include the Web3 library -->
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
