@@ -18,8 +18,8 @@
 
     <!-- Second Banner -->
     <div class="banner">
-        <div class="connection-status">
-            <div id="accountBalance"></div> <!-- Display connected account balance -->
+        <div class="account-info">
+            <span id="accountBalance"></span> <!-- Display connected account balance -->
         </div>
     </div>
 
@@ -66,7 +66,7 @@
             const balance = await web3.eth.getBalance(account);
             // Convert balance to ether and display with four decimal points
             const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
-            document.getElementById('balanceText').textContent = `${balanceInEther} ETH`;
+            document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
             // Display connected account address
             document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
         }

@@ -31,15 +31,8 @@
 }
 
 #accountBalance {
-    display: flex;
-    align-items: center; /* Center items vertically */
     margin-top: 0px; /* Add margin between button and balance */
+    margin-left: 1200px;
     text-align: right; /* Align text to the right */
     flex-grow: 1; /* Allow the balance to take up remaining space */
-}
-
-#accountBalance img {
-    width: 30px; /* Adjust logo width */
-    height: auto; /* Maintain aspect ratio */
-    margin-right: 5px; /* Add margin between logo and balance text */
 }
