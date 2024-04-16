@@ -3,10 +3,6 @@ const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
 
-//test1
-//wedw
-//sdwedwedw
-
 // Contract ABI
 const contractABI = [
     {
