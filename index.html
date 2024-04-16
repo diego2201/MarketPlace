@@ -4,16 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web3 Request</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Include the external CSS file -->
 </head>
 <body>
+    <!-- Banner -->
+    <div class="banner">
+        <h1>Web3 Request Website</h1> <!-- Left-aligned name -->
+        <div class="connection-status">
+            <button onclick="connectMetamask()" class="metamask-button"></button> <!-- Right-aligned button with MetaMask symbol -->
+            <span id="connection-text">Not connected</span> <!-- Text to display connection status -->
+        </div>
+    </div>
+
     <!-- Include the Web3 library -->
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
     <!-- Include your JavaScript file -->
     <script src="banking.js"></script>
 
-    <!-- Button to connect Metamask -->
-    <button onclick="connectMetamask()">Connect Metamask</button>
-    
     <!-- Display connected account address -->
     <div id="accountAddress"></div>
     
@@ -35,19 +42,21 @@
     <!-- Button to retrieve data from contract -->
     <button onclick="retrieveDataFromContract()">Retrieve Data from Contract</button>
 
+    <!-- Script for MetaMask connection -->
     <script>
         async function connectMetamask() {
             if (window.ethereum) {
                 try {
                     // Request access to Metamask accounts
                     const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    console.log('Connected to Metamask:', accounts);
+                    console.log('Connected to MetaMask:', accounts);
                     displayAccountInfo(accounts[0]);
+                    document.getElementById('connection-text').textContent = 'Connected'; // Update connection status text
                 } catch (error) {
-                    console.error('Error connecting to Metamask:', error);
+                    console.error('Error connecting to MetaMask:', error);
                 }
             } else {
-                console.error('Metamask not detected or installed.');
+                console.error('MetaMask not detected or installed.');
             }
         }
 

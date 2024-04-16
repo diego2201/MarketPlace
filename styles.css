@@ -1,0 +1,30 @@
+/* styles.css */
+.banner {
+    background-color: #8B0000; /* Dark red color */
+    color: white;
+    padding: 10px;
+    display: flex; /* Use flexbox for layout */
+    justify-content: space-between; /* Align items with space between them */
+    align-items: center; /* Align items vertically */
+}
+
+.banner h1 {
+    margin: 0; /* Remove default margin for the h1 element */
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+}
+
+.metamask-button {
+    background-image: url('metamask-logo.png'); /* Add MetaMask logo as background image */
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-color: transparent;
+    width: 30px; /* Set width and height to adjust size */
+    height: 30px;
+    border: none; /* Remove button border */
+    cursor: pointer; /* Change cursor to pointer on hover */
+    margin-right: 5px; /* Add margin between button and text */
+}
