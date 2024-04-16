@@ -13,7 +13,7 @@
         <div class="connection-status">
             <button onclick="connectMetamask()" class="metamask-button"></button> <!-- Right-aligned button with MetaMask symbol -->
             <span id="connection-text">Not connected</span> <!-- Text to display connection status -->
-            <!-- Display connected account address -->
+            <!-- Display connected account balance -->
             <div id="accountBalance"></div>
         </div>
     </div>
@@ -59,8 +59,8 @@
         async function displayAccountInfo(account) {
             // Get account balance
             const balance = await web3.eth.getBalance(account);
-            // Convert balance to ether and display
-            const balanceInEther = web3.utils.fromWei(balance, 'ether');
+            // Convert balance to ether and display with four decimal points
+            const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
             document.getElementById('accountBalance').textContent = `Account Balance: ${balanceInEther} ETH`;
             // Display connected account address
             document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
