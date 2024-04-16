@@ -1,6 +1,11 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
+//const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
 const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
+
+//test1
+//wedw
+//sdwedwedw
 
 // Contract ABI
 const contractABI = [
@@ -54,10 +59,11 @@ async function retrieveDataFromContract() {
 }
 
 
-//send data
+
 async function setDataInContract(data) {
     try {
         if (window.ethereum) {
+            // Request access to MetaMask accounts
             const encodedData = contract.methods.setData(data).encodeABI();
 
             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
@@ -68,19 +74,20 @@ async function setDataInContract(data) {
                 from: from,
                 to: contractAddress,
                 gas: await web3.eth.estimateGas({
-                    from: from,
                     to: contractAddress,
                     data: encodedData
                 }),
-                gasPrice: await web3.eth.getGasPrice(),
                 data: encodedData
-            };
+            };                
 
-            // Send the transaction via MetaMask
-            const transactionHash = await ethereum.request({
-                method: 'eth_sendTransaction',
-                params: [txObject],
+            // Prompt user to sign the transaction
+            const signature = await ethereum.request({
+                method: "personal_sign",
+                params: [JSON.stringify(txObject), from], // Signing the transaction object
             });
+
+            // Send the signed transaction to Infura
+            const transactionHash = await web3.eth.sendSignedTransaction('0x' + signature.raw); // Ensure prefix '0x'
 
             console.log('Transaction sent. Hash:', transactionHash);
         } else {
@@ -90,6 +97,7 @@ async function setDataInContract(data) {
         console.error('Error:', error);
     }
 }
+
 
 // Function to send a request to Infura and update the webpage with the latest block number
 async function sendRequestToInfura() {
@@ -117,20 +125,5 @@ async function checkContractValidity(contractAddress) {
         }
     } catch (error) {
         console.error('Error checking contract validity:', error);
-    }
-}
-
-// Function to request access to MetaMask accounts and then call setDataInContract
-async function requestAccountsAndSetData(data) {
-    try {
-        if (window.ethereum) {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const from = accounts[0];
-            await setDataInContract(data, from);
-        } else {
-            console.error('MetaMask is not detected.');
-        }
-    } catch (error) {
-        console.error('Error:', error);
     }
 }
