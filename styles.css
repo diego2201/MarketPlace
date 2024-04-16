@@ -3,8 +3,9 @@
     color: white;
     padding: 10px;
     display: flex; /* Use flexbox for layout */
-    justify-content: space-between; /* Align items with space between them */
-    align-items: center; /* Align items vertically */
+    flex-direction: column; /* Change flex direction to column */
+    justify-content: center; /* Align items vertically */
+    align-items: center; /* Center items horizontally */
 }
 
 .banner h1 {
@@ -13,7 +14,8 @@
 
 .connection-status {
     display: flex;
-    align-items: center;
+    flex-direction: column; /* Change flex direction to column */
+    align-items: center; /* Center items horizontally */
 }
 
 .metamask-button {
@@ -25,5 +27,9 @@
     height: 30px;
     border: none; /* Remove button border */
     cursor: pointer; /* Change cursor to pointer on hover */
-    margin-right: 5px; /* Add margin between button and text */
+    margin-bottom: 5px; /* Add margin between button and text */
+}
+
+#accountBalance {
+    margin-top: 5px; /* Add margin between button and balance */
 }
