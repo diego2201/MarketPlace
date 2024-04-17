@@ -1,7 +1,6 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
 //const privateKey = '2dfdc6f05686cecb8c4ecf925a7d47141a36a509d1846f13461c68fac262713c';
-// const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
-const account = '0x058aF1F045092aC4d4509555E9b7B2d79d581238';
+const account = '0xEA5DD500979dc7A5764D253cf429200437183371'; // Define the account address here
 const web3 = new Web3(infuraUrl);
 
 // Contract ABI
@@ -37,7 +36,8 @@ const contractABI = [
 ];
 
 // Contract address
-const contractAddress = '0xB41cfBE072d0AA695e737e17F6Cd9E44F095408c';
+//const contractAddress = '0xB41cfBE072d0AA695e737e17F6Cd9E44F095408c';
+const contractAddress = '0x058aF1F045092aC4d4509555E9b7B2d79d581238';
 
 // Contract instance
 const contract = new web3.eth.Contract(contractABI, contractAddress);
