@@ -4,74 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Web3 Request</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Include the external CSS file -->
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Banner -->
     <div class="banner">
-        <h1>Web3 Request Website</h1> <!-- Left-aligned name -->
+        <h1>Web3 Request Website</h1>
         <div class="connection-status">
-            <button onclick="connectMetamask()" class="metamask-button"></button> <!-- Right-aligned button with MetaMask symbol -->
-            <span id="connection-text">Not connected</span> <!-- Text to display connection status -->
+            <button onclick="connectMetamask()" class="metamask-button"></button>
+            <span id="connection-text">Not connected</span>
         </div>
     </div>
 
-    <!-- Second Banner -->
     <div class="banner">
         <div class="account-info">
-            <img src="eth_logo.png" alt="Ethereum Logo" class="account-image"> <!-- Ethereum Logo -->
-            <span id="accountBalance"></span> <!-- Display connected account balance -->
+            <img src="eth_logo.png" alt="Ethereum Logo" class="account-image">
+            <span id="accountBalance"></span>
         </div>
     </div>
 
-    <!-- Include the Web3 library -->
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
-    <!-- Include your JavaScript file -->
     <script src="banking.js"></script>
 
-    <!-- Placeholder element to display the latest block number -->
     <div id="latestBlockNumber"></div>
 
-    <!-- Button to trigger the request to Infura -->
     <button onclick="sendRequestToInfura()">Get Latest Block Number</button>
-
-    <!-- Button to check contract validity -->
     <button onclick="checkContractValidity(contractAddress)">Check Contract Validity</button>
-
-    <!-- Button to set data in contract -->
     <button onclick="setDataInContract('notherOne')">Set Data in Contract</button>
+    <button onclick="displayRetrievedData()">Retrieve Data from Contract</button>
 
-    <!-- Button to retrieve data from contract -->
-    <button onclick="retrieveDataFromContract()">Retrieve Data from Contract</button>
-
-    <!-- Script for MetaMask connection -->
-    <script>
-        async function connectMetamask() {
-            if (window.ethereum) {
-                try {
-                    // Request access to Metamask accounts
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    console.log('Connected to MetaMask:', accounts);
-                    displayAccountInfo(accounts[0]);
-                    document.getElementById('connection-text').textContent = 'Connected'; // Update connection status text
-                } catch (error) {
-                    console.error('Error connecting to MetaMask:', error);
-                }
-            } else {
-                console.error('MetaMask not detected or installed.');
-            }
-        }
-
-        async function displayAccountInfo(account) {
-            // Get account balance
-            const balance = await web3.eth.getBalance(account);
-            // Convert balance to ether and display with four decimal points
-            const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
-            document.getElementById('accountBalance').textContent = `${balanceInEther} ETH`; // Update account balance text
-            // Display connected account address
-            //document.getElementById('accountAddress').textContent = `Account Address: ${account}`;
-        }
-    </script>
-    
+    <div id="retrievedData"></div>
 </body>
 </html>
