@@ -101,3 +101,32 @@ async function displayAccountInfo(account) {
     const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
     document.getElementById('accountBalance').textContent = `${balanceInEther} ETH`;
 }
+
+// Function to send a request to Infura and update the webpage with the latest block number
+async function sendRequestToInfura() {
+    try {
+        // Get the latest block number from the blockchain
+        const latestBlockNumber = await web3.eth.getBlockNumber();
+        console.log('Latest block number:', latestBlockNumber);
+        
+        // Update the content of the latestBlockNumber div
+        document.getElementById('latestBlockNumber').textContent = `Latest Block Number: ${latestBlockNumber}`;
+    } catch (error) {
+        console.error('Error sending request to Infura:', error);
+    }
+}
+
+// Function to check if the contract address is valid on the blockchain
+async function checkContractValidity(contractAddress) {
+    try {
+        // Get code at contract address
+        const code = await web3.eth.getCode(contractAddress);
+        if (code === '0x') {
+            console.error('Contract address is not valid:', contractAddress);
+        } else {
+            console.log('Contract address is valid:', contractAddress);
+        }
+    } catch (error) {
+        console.error('Error checking contract validity:', error);
+    }
+}
