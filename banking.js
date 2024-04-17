@@ -54,45 +54,77 @@ async function retrieveDataFromContract() {
     }
 }
 
-
-
 async function setDataInContract(data) {
     try {
-        if (window.ethereum) {
-            // Request access to MetaMask accounts
-            const encodedData = contract.methods.setData(data).encodeABI();
+        // Request access to MetaMask accounts
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        const from = accounts[0];
 
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const from = accounts[0];
+        // Encode the data for the contract method
+        const encodedData = web3.eth.abi.encodeFunctionCall({
+            name: 'setData',
+            type: 'function',
+            inputs: [{ type: 'string', name: '_data' }]
+        }, [data]);
 
-            // Prepare the transaction object
-            const txObject = {
-                from: from,
-                to: contractAddress,
-                gas: await web3.eth.estimateGas({
-                    to: contractAddress,
-                    data: encodedData
-                }),
-                data: encodedData
-            };                
+        // Construct the transaction object
+        const txObject = {
+            from: from,
+            to: contractAddress,
+            data: encodedData,
+            gas: '0x' // Let MetaMask estimate gas
+        };
 
-            // Prompt user to sign the transaction
-            const signature = await ethereum.request({
-                method: "personal_sign",
-                params: [JSON.stringify(txObject), from], // Signing the transaction object
-            });
+        // Sign and send the transaction
+        const signedTx = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txObject],
+        });
 
-            // Send the signed transaction to Infura
-            const transactionHash = await web3.eth.sendSignedTransaction('0x' + signature.raw); // Ensure prefix '0x'
-
-            console.log('Transaction sent. Hash:', transactionHash);
-        } else {
-            console.error('MetaMask is not detected.');
-        }
+        console.log('Transaction sent. Hash:', signedTx);
     } catch (error) {
         console.error('Error:', error);
     }
 }
+
+
+// async function setDataInContract(data) {
+//     try {
+//         if (window.ethereum) {
+//             // Request access to MetaMask accounts
+//             const encodedData = contract.methods.setData(data).encodeABI();
+
+//             const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+//             const from = accounts[0];
+
+//             // Prepare the transaction object
+//             const txObject = {
+//                 from: from,
+//                 to: contractAddress,
+//                 gas: await web3.eth.estimateGas({
+//                     to: contractAddress,
+//                     data: encodedData
+//                 }),
+//                 data: encodedData
+//             };                
+
+//             // Prompt user to sign the transaction
+//             const signature = await ethereum.request({
+//                 method: "personal_sign",
+//                 params: [JSON.stringify(txObject), from], // Signing the transaction object
+//             });
+
+//             // Send the signed transaction to Infura
+//             const transactionHash = await web3.eth.sendSignedTransaction('0x' + signature.raw); // Ensure prefix '0x'
+
+//             console.log('Transaction sent. Hash:', transactionHash);
+//         } else {
+//             console.error('MetaMask is not detected.');
+//         }
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
 
 
 // Function to send a request to Infura and update the webpage with the latest block number
