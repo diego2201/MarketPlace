@@ -153,8 +153,6 @@ async function listNewItem() {
 }
 
 
-
-
 async function connectMetamask() {
     if (window.ethereum) {
         try {
