@@ -6,34 +6,48 @@ const contractABI = [
     {
         "constant": false,
         "inputs": [
-            {
-                "name": "_data",
-                "type": "string"
-            }
+            {"name": "_title", "type": "string"},
+            {"name": "_description", "type": "string"},
+            {"name": "_price", "type": "uint256"}
         ],
-        "name": "setData",
+        "name": "listNewItem",
         "outputs": [],
-        "payable": false,
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
-        "constant": true,
-        "inputs": [],
-        "name": "getData",
-        "outputs": [
-            {
-                "name": "",
-                "type": "string"
-            }
+        "constant": false,
+        "inputs": [
+            {"name": "itemId", "type": "uint256"}
         ],
-        "payable": false,
+        "name": "purchaseItem",
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [
+            {"name": "itemId", "type": "uint256"}
+        ],
+        "name": "getItemDetails",
+        "outputs": [
+            {"name": "id", "type": "uint256"},
+            {"name": "seller", "type": "address"},
+            {"name": "owner", "type": "address"},
+            {"name": "title", "type": "string"},
+            {"name": "description", "type": "string"},
+            {"name": "price", "type": "uint256"},
+            {"name": "isSold", "type": "bool"}
+        ],
         "stateMutability": "view",
         "type": "function"
     }
 ];
 
-const contractAddress = '0x058aF1F045092aC4d4509555E9b7B2d79d581238';
+
+const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 async function setDataInContract(data) {
@@ -71,6 +85,30 @@ async function retrieveDataFromContract() {
         return null;
     }
 }
+
+async function retrieveItemDetails() {
+    const itemId = document.getElementById('itemID').value;
+    if (!itemId) {
+        alert('Please enter a valid Item ID');
+        return;
+    }
+    try {
+        const details = await contract.methods.getItemDetails(itemId).call();
+        const detailsDisplay = `
+            <p><strong>ID:</strong> ${details.id}</p>
+            <p><strong>Title:</strong> ${details.title}</p>
+            <p><strong>Description:</strong> ${details.description}</p>
+            <p><strong>Price:</strong> ${web3.utils.fromWei(details.price, 'ether')} ETH</p>
+            <p><strong>Owner:</strong> ${details.owner}</p>
+            <p><strong>Sold:</strong> ${details.isSold ? 'Yes' : 'No'}</p>
+        `;
+        document.getElementById('itemDetails').innerHTML = detailsDisplay;
+    } catch (error) {
+        console.error('Error retrieving item details:', error);
+        document.getElementById('itemDetails').innerHTML = `<p>Error retrieving details. See console.</p>`;
+    }
+}
+
 
 async function displayRetrievedData() {
     try {

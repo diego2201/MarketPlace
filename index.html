@@ -3,35 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web3 Request</title>
+    <title>Marketplace Interface</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
 </head>
 <body>
     <div class="banner">
-        <h1>Web3 Request Website</h1>
+        <h1>Marketplace Web3 Interface</h1>
         <div class="connection-status">
-            <button onclick="connectMetamask()" class="metamask-button"></button>
+            <button onclick="connectMetamask()" class="metamask-button">Connect MetaMask</button>
             <span id="connection-text">Not connected</span>
         </div>
     </div>
 
-    <div class="banner">
-        <div class="account-info">
-            <img src="eth_logo.png" alt="Ethereum Logo" class="account-image">
-            <span id="accountBalance"></span>
-        </div>
+    <div>
+        <input id="itemID" placeholder="Enter Item ID">
+        <button onclick="retrieveItemDetails()">Retrieve Item Details</button>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
-    <script src="banking.js"></script>
+    <div id="itemDetails"></div>
 
-    <div id="latestBlockNumber"></div>
-
-    <!-- <button onclick="sendRequestToInfura()">Get Latest Block Number</button>
-    <button onclick="checkContractValidity(contractAddress)">Check Contract Validity</button> -->
-    <button onclick="setDataInContract('notherOne')">Set Data in Contract</button>
-    <button onclick="displayRetrievedData()">Retrieve Data from Contract</button>
-
-    <div id="retrievedData"></div>
+    <script src="marketplace.js"></script>
 </body>
 </html>
