@@ -123,8 +123,12 @@ async function connectMetamask() {
 }
 
 async function displayAccountInfo(account) {
-    const balance = await web3.eth.getBalance(account);
-    const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
-    document.getElementById('accountBalance').textContent = `${balanceInEther} ETH`;
+    try {
+        const balance = await web3.eth.getBalance(account);
+        const balanceInEther = web3.utils.fromWei(balance, 'ether');
+        document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
+    } catch (error) {
+        console.error('Error fetching account info:', error);
+    }
 }
 
