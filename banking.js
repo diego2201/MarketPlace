@@ -127,3 +127,4 @@ async function displayAccountInfo(account) {
     const balanceInEther = (parseFloat(web3.utils.fromWei(balance, 'ether'))).toFixed(4);
     document.getElementById('accountBalance').textContent = `${balanceInEther} ETH`;
 }
+
