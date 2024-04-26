@@ -91,7 +91,7 @@ async function loadMarketplaceItems() {
         const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
         let itemsDisplay = '';
 
-        for (let i = 1; i < itemCount; i++) {  // Change this to i < itemCount
+        for (let i = 0; i < itemCount; i++) {  // Change this to i < itemCount
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
                 <div class="item">
