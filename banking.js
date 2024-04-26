@@ -103,7 +103,7 @@ async function loadMarketplaceItems() {
     }
 }
 
-// Load items when the window loads
+// Load items when the window loads please? 
 window.addEventListener('load', loadMarketplaceItems);
 
 async function displayRetrievedData() {
