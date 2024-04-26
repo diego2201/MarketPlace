@@ -101,23 +101,29 @@ window.addEventListener('load', loadMarketplaceItems);
 
 async function purchaseItem(itemId) {
     try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
+        // Ensure MetaMask is connected
+        if (typeof window.ethereum !== 'undefined') {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
 
-        const receipt = await contract.methods.purchaseItem(itemId).send({
-            from: accounts[0],
-            value: itemPrice,
-            gas: 3000000
-        });
+            const receipt = await contract.methods.purchaseItem(itemId).send({
+                from: accounts[0],
+                value: itemPrice,
+                gas: 3000000 // Optionally adjust gas based on the requirement
+            });
 
-        console.log('Transaction receipt:', receipt);
-        alert(`Item ${itemId} purchased successfully!`);
-        loadMarketplaceItems(); // Refresh items
+            console.log('Transaction receipt:', receipt);
+            alert(`Item ${itemId} purchased successfully!`);
+            loadMarketplaceItems(); // Refresh items
+        } else {
+            throw new Error('MetaMask is not available');
+        }
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
+
 
 async function connectMetamask() {
     if (window.ethereum) {
