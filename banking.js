@@ -114,8 +114,10 @@ async function connectMetamask() {
             console.log('Connected to MetaMask:', accounts);
             displayAccountInfo(accounts[0]);
             document.getElementById('connection-text').textContent = 'Connected';
+            document.getElementById('userAddress').textContent = accounts[0];
         } catch (error) {
             console.error('Error connecting to MetaMask:', error);
+            document.getElementById('connection-text').textContent = 'Connection failed';
         }
     } else {
         console.error('MetaMask not detected or installed.');
