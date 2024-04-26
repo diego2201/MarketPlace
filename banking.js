@@ -78,7 +78,7 @@ async function setDataInContract(data) {
 async function loadMarketplaceItems() {
     try {
         // Use the getTotalItemCount() method instead of directly accessing nextItemId
-        const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
+        const itemCount = await contract.methods.getTotalItemCount().call();
         let itemsDisplay = '';
 
         for (let i = 1; i <= itemCount; i++) {
@@ -114,6 +114,7 @@ async function displayRetrievedData() {
         console.error('Error displaying retrieved data:', error);
     }
 }
+
 
 async function connectMetamask() {
     if (window.ethereum) {
