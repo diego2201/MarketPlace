@@ -23,6 +23,15 @@
         <!-- All marketplace items will be displayed here -->
     </div>
 
+    <div id="listItemForm">
+        <h2>List a New Item</h2>
+        <input type="text" id="itemTitle" placeholder="Item Title" required>
+        <input type="text" id="itemDescription" placeholder="Item Description" required>
+        <input type="text" id="itemPrice" placeholder="Item Price in Wei" required>
+        <button onclick="listNewItem()">List Item</button>
+    </div>
+    
+
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
     <script src="banking.js"></script>
 </body>

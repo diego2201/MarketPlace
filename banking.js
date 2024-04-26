@@ -1,15 +1,5 @@
-// Ensure web3 is initialized properly with MetaMask's provider
-if (window.ethereum) {
-    web3 = new Web3(window.ethereum);
-    try {
-        // Request account access if needed
-        await window.ethereum.request({ method: 'eth_requestAccounts' });
-    } catch (error) {
-        console.error('User denied account access:', error);
-    }
-} else {
-    console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-}
+const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
+const web3 = new Web3(infuraUrl);
 
 const contractABI = [
     // ListNewItem
@@ -68,7 +58,6 @@ const contractABI = [
         "type": "function"
     }
 ];
-
 
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
@@ -150,6 +139,41 @@ async function purchaseItem(itemId) {
     }
 }
 
+async function listNewItem() {
+    try {
+        const title = document.getElementById('itemTitle').value;
+        const description = document.getElementById('itemDescription').value;
+        const price = document.getElementById('itemPrice').value;
+
+        if (!title || !description || !price) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const from = accounts[0];
+
+        // Call the listNewItem function of the contract
+        const receipt = await contract.methods.listNewItem(title, description, price).send({
+            from: from,
+            gas: 3000000 // Adjust gas limit based on the contract's requirements
+        });
+
+        console.log('Item listed successfully:', receipt);
+        alert('Item listed successfully!');
+
+        // Clear the form
+        document.getElementById('itemTitle').value = '';
+        document.getElementById('itemDescription').value = '';
+        document.getElementById('itemPrice').value = '';
+
+        // Optionally, refresh the listed items or make UI updates here
+        loadMarketplaceItems();
+    } catch (error) {
+        console.error('Error listing item:', error);
+        alert(`Failed to list item: ${error.message}`);
+    }
+}
 
 
 
