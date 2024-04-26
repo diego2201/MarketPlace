@@ -98,6 +98,37 @@ async function retrieveItemDetails() {
     }
 }
 
+
+
+
+// Assuming you have a function that retrieves the products from the smart contract...
+async function displayProducts() {
+    const productCount = await contract.methods.getProductCount().call();
+    const productListTable = document.querySelector("#productList table");
+
+    for (let i = 1; i <= productCount; i++) {
+        const product = await contract.methods.products(i).call();
+
+        const productRow = `
+            <tr>
+                <td>${product.id}</td>
+                <td>${product.title}</td>
+                <td>${web3.utils.fromWei(product.price, 'ether')} ETH</td>
+                <td>${product.owner}</td>
+                <td><button onclick="purchaseProduct(${product.id})">Buy</button></td>
+            </tr>
+        `;
+
+        productListTable.innerHTML += productRow;
+    }
+}
+
+// Call this function to populate the list on page load or after a product is added
+displayProducts();
+
+
+
+
 async function displayRetrievedData() {
     try {
         const retrievedData = await retrieveDataFromContract();
