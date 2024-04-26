@@ -117,6 +117,30 @@ async function loadMarketplaceItems() {
 // Load items when the window loads please? 
 window.addEventListener('load', loadMarketplaceItems);
 
+async function purchaseItem(itemId) {
+    try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }); // Request account access
+        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price); // Fetch the price of the item
+        
+        // Call the purchaseItem function of the contract
+        const receipt = await contract.methods.purchaseItem(itemId).send({
+            from: accounts[0],
+            value: itemPrice, // Amount to be sent with the transaction
+            gas: 3000000 // Gas limit, adjust based on requirements
+        });
+
+        console.log('Transaction receipt:', receipt);
+        alert(`Item ${itemId} purchased successfully!`);
+
+        // Optionally, refresh items or make UI updates here
+        loadMarketplaceItems();
+    } catch (error) {
+        console.error('Error purchasing item:', error);
+        alert(`Failed to purchase item: ${error.message}`);
+    }
+}
+
+
 async function displayRetrievedData() {
     try {
         const retrievedData = await retrieveDataFromContract();
