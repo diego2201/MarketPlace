@@ -77,8 +77,8 @@ async function setDataInContract(data) {
 
 async function loadMarketplaceItems() {
     try {
-        // Assuming nextItemId gives the count of the next item to be added, so we subtract 1 to get the total items added.
-        const itemCount = parseInt(await contract.methods.nextItemId().call(), 10) - 1;
+        // Use the getTotalItemCount() method instead of directly accessing nextItemId
+        const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
         let itemsDisplay = '';
 
         for (let i = 1; i <= itemCount; i++) {
@@ -97,11 +97,15 @@ async function loadMarketplaceItems() {
             `;
         }
 
-        document.getElementById('itemDetails').innerHTML = itemsDisplay;
+        document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
     } catch (error) {
         console.error('Error loading marketplace items:', error);
     }
 }
+
+// Load items when the window loads
+window.addEventListener('load', loadMarketplaceItems);
+
 
 // Load items when the window loads
 window.addEventListener('load', loadMarketplaceItems);
