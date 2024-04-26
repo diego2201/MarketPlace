@@ -115,6 +115,8 @@ async function displayRetrievedData() {
     }
 }
 
+//test code to refhuweuirfghweurhgwuierfghui
+
 async function connectMetamask() {
     if (window.ethereum) {
         try {
