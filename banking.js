@@ -101,28 +101,41 @@ window.addEventListener('load', loadMarketplaceItems);
 
 async function purchaseItem(itemId) {
     try {
-        // Ensure MetaMask is connected
-        if (typeof window.ethereum !== 'undefined') {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const from = accounts[0];
 
-            const receipt = await contract.methods.purchaseItem(itemId).send({
-                from: accounts[0],
-                value: itemPrice,
-                gas: 3000000 // Optionally adjust gas based on the requirement
-            });
+        // Fetch the price of the item directly from the contract
+        const item = await contract.methods.getItemDetails(itemId).call();
+        const itemPrice = item.price;
 
-            console.log('Transaction receipt:', receipt);
-            alert(`Item ${itemId} purchased successfully!`);
-            loadMarketplaceItems(); // Refresh items
-        } else {
-            throw new Error('MetaMask is not available');
-        }
+        // Encode the function call to the contract
+        const purchaseData = contract.methods.purchaseItem(itemId).encodeABI();
+
+        const txObject = {
+            from: from,
+            to: contractAddress,
+            data: purchaseData,
+            value: itemPrice,
+            gas: 3000000 // Set a sufficient gas limit for the transaction
+        };
+
+        // Send the transaction via MetaMask
+        const transactionHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txObject],
+        });
+
+        console.log('Transaction sent. Hash:', transactionHash);
+        alert(`Item ${itemId} purchased successfully!`);
+
+        // Optionally, refresh items or make UI updates here
+        loadMarketplaceItems();
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
+
 
 
 async function connectMetamask() {
@@ -147,3 +160,30 @@ async function displayAccountInfo(account) {
     const balanceInEther = web3.utils.fromWei(balance, 'ether');
     document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
 }
+
+
+
+// async function setDataInContract(data) {
+//     try {
+//         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+//         const from = accounts[0];
+//         const encodedData = web3.utils.utf8ToHex(data);
+//         const defaultGasLimit = '0x300000';
+
+//         const txObject = {
+//             from: from,
+//             to: contractAddress,
+//             data: encodedData,
+//             gas: defaultGasLimit,
+//         };
+
+//         const transactionHash = await ethereum.request({
+//             method: 'eth_sendTransaction',
+//             params: [txObject],
+//         });
+
+//         console.log('Transaction sent. Hash:', transactionHash);
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
