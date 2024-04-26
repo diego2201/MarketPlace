@@ -106,10 +106,6 @@ async function loadMarketplaceItems() {
 // Load items when the window loads
 window.addEventListener('load', loadMarketplaceItems);
 
-
-// Load items when the window loads
-window.addEventListener('load', loadMarketplaceItems);
-
 async function displayRetrievedData() {
     try {
         const retrievedData = await retrieveDataFromContract();
