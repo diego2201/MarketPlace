@@ -104,40 +104,22 @@ async function purchaseItem(itemId) {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const from = accounts[0];
 
-        // Fetch the price of the item directly from the contract
-        const item = await contract.methods.getItemDetails(itemId).call();
-        const itemPrice = item.price;
+        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
 
-        // Ensure that the price is formatted as a hex string
-        const valueHex = web3.utils.toHex(itemPrice);
-
-        // Encode the function call to the contract
-        const purchaseData = contract.methods.purchaseItem(itemId).encodeABI();
-
-        const txObject = {
+        // Send the purchase transaction
+        const receipt = await contract.methods.purchaseItem(itemId).send({
             from: from,
-            to: contractAddress,
-            data: purchaseData,
-            value: valueHex, // Ensure value is in hex format
-            gas: 3000000 // Set a sufficient gas limit for the transaction
-        };
-
-        // Send the transaction via MetaMask
-        const transactionHash = await ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txObject],
+            value: itemPrice
         });
 
-        console.log('Transaction sent. Hash:', transactionHash);
+        console.log('Purchase successful:', receipt);
         alert(`Item ${itemId} purchased successfully!`);
-
-        // Optionally, refresh items or make UI updates here
-        loadMarketplaceItems();
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
+
 
 async function listNewItem() {
     try {
@@ -155,25 +137,21 @@ async function listNewItem() {
 
         // Call the listNewItem function of the contract
         const receipt = await contract.methods.listNewItem(title, description, price).send({
-            from: from,
-            gas: 3000000 // Adjust gas limit based on the contract's requirements
+            from: from
         });
 
         console.log('Item listed successfully:', receipt);
         alert('Item listed successfully!');
-
-        // Clear the form
+        // Clear inputs after successful listing
         document.getElementById('itemTitle').value = '';
         document.getElementById('itemDescription').value = '';
         document.getElementById('itemPrice').value = '';
-
-        // Optionally, refresh the listed items or make UI updates here
-        loadMarketplaceItems();
     } catch (error) {
         console.error('Error listing item:', error);
         alert(`Failed to list item: ${error.message}`);
     }
 }
+
 
 
 
