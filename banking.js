@@ -86,6 +86,8 @@ async function retrieveDataFromContract() {
     }
 }
 
+//test
+
 async function retrieveItemDetails() {
     const itemId = document.getElementById('itemID').value;
     if (!itemId) {
