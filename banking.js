@@ -97,7 +97,7 @@ async function loadMarketplaceItems() {
         const marketplaceItems = document.getElementById('marketplaceItems');
         marketplaceItems.innerHTML = itemsDisplay;
 
-        // Attach event listeners to buy buttons after rendering
+        // Attach event listeners to buy buttons
         marketplaceItems.querySelectorAll('.buy-button').forEach(button => {
             button.addEventListener('click', function() {
                 purchaseItem(this.getAttribute('data-item-id'));
@@ -108,35 +108,97 @@ async function loadMarketplaceItems() {
     }
 }
 
+window.addEventListener('load', loadMarketplaceItems);
+
 async function purchaseItem(itemId) {
     try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
+        const from = accounts[0];
+
+        // Fetch the price of the item directly from the contract
+        const item = await contract.methods.getItemDetails(itemId).call();
+        const itemPrice = item.price;
+
+        // Ensure that the price is formatted as a hex string
         const valueHex = web3.utils.toHex(itemPrice);
 
+        // Encode the function call to the contract
         const purchaseData = contract.methods.purchaseItem(itemId).encodeABI();
 
         const txObject = {
-            from: accounts[0],
+            from: from,
             to: contractAddress,
             data: purchaseData,
-            value: valueHex,
+            value: valueHex, // Ensure value is in hex format
             gas: 3000000 // Set a sufficient gas limit for the transaction
         };
 
-        console.log('Sending transaction:', txObject);
-        const transactionHash = await window.ethereum.request({
+        // Send the transaction via MetaMask
+        const transactionHash = await ethereum.request({
             method: 'eth_sendTransaction',
             params: [txObject],
         });
 
         console.log('Transaction sent. Hash:', transactionHash);
         alert(`Item ${itemId} purchased successfully!`);
-        loadMarketplaceItems(); // Optionally refresh the item list
+
+        // Optionally, refresh items or make UI updates here
+        loadMarketplaceItems();
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
 
-window.addEventListener('load', loadMarketplaceItems);
+
+
+
+async function connectMetamask() {
+    if (window.ethereum) {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log('Connected to MetaMask:', accounts);
+            displayAccountInfo(accounts[0]);
+            document.getElementById('connection-text').textContent = 'Connected';
+            document.getElementById('userAddress').textContent = accounts[0];
+        } catch (error) {
+            console.error('Error connecting to MetaMask:', error);
+            document.getElementById('connection-text').textContent = 'Connection failed';
+        }
+    } else {
+        console.error('MetaMask not detected or installed.');
+    }
+}
+
+async function displayAccountInfo(account) {
+    const balance = await web3.eth.getBalance(account);
+    const balanceInEther = web3.utils.fromWei(balance, 'ether');
+    document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
+}
+
+
+
+// async function setDataInContract(data) {
+//     try {
+//         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+//         const from = accounts[0];
+//         const encodedData = web3.utils.utf8ToHex(data);
+//         const defaultGasLimit = '0x300000';
+
+//         const txObject = {
+//             from: from,
+//             to: contractAddress,
+//             data: encodedData,
+//             gas: defaultGasLimit,
+//         };
+
+//         const transactionHash = await ethereum.request({
+//             method: 'eth_sendTransaction',
+//             params: [txObject],
+//         });
+
+//         console.log('Transaction sent. Hash:', transactionHash);
+//     } catch (error) {
+//         console.error('Error:', error);
+//     }
+// }
