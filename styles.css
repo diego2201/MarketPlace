@@ -19,7 +19,7 @@
 
 .metamask-button {
     background-image: url('metamask-logo.png'); /* Add MetaMask logo as background image */
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     background-color: transparent;
     width: 30px; /* Set width and height to adjust size */
