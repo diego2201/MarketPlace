@@ -1,8 +1,8 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
-const account = '0xEA5DD500979dc7A5764D253cf429200437183371';
 const web3 = new Web3(infuraUrl);
 
 const contractABI = [
+    // ListNewItem
     {
         "constant": false,
         "inputs": [
@@ -15,6 +15,7 @@ const contractABI = [
         "stateMutability": "nonpayable",
         "type": "function"
     },
+    // PurchaseItem
     {
         "constant": false,
         "inputs": [
@@ -26,6 +27,7 @@ const contractABI = [
         "stateMutability": "payable",
         "type": "function"
     },
+    // GetItemDetails
     {
         "constant": true,
         "inputs": [
@@ -44,6 +46,7 @@ const contractABI = [
         "stateMutability": "view",
         "type": "function"
     },
+    // GetTotalItemCount
     {
         "constant": true,
         "inputs": [],
@@ -56,42 +59,15 @@ const contractABI = [
     }
 ];
 
-
-
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
-
-async function setDataInContract(data) {
-    try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const from = accounts[0];
-        const encodedData = web3.utils.utf8ToHex(data);
-        const defaultGasLimit = '0x300000';
-
-        const txObject = {
-            from: from,
-            to: contractAddress,
-            data: encodedData,
-            gas: defaultGasLimit,
-        };
-
-        const transactionHash = await ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txObject],
-        });
-
-        console.log('Transaction sent. Hash:', transactionHash);
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
 
 async function loadMarketplaceItems() {
     try {
         const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
         let itemsDisplay = '';
 
-        for (let i = 0; i < itemCount; i++) {  // Change this to i < itemCount
+        for (let i = 0; i < itemCount; i++) {
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
                 <div class="item">
@@ -102,54 +78,46 @@ async function loadMarketplaceItems() {
                     <p><strong>Owner:</strong> ${item.owner}</p>
                     <p><strong>Seller:</strong> ${item.seller}</p>
                     <p><strong>Sold:</strong> ${item.isSold ? 'Yes' : 'No'}</p>
-                    ${!item.isSold ? `<button onclick="purchaseItem(${item.id})">Buy</button>` : ''}
+                    ${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : ''}
                 </div>
             `;
         }
 
-        document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
+        const marketplaceItems = document.getElementById('marketplaceItems');
+        marketplaceItems.innerHTML = itemsDisplay;
+
+        // Attach event listeners to buy buttons
+        marketplaceItems.querySelectorAll('.buy-button').forEach(button => {
+            button.addEventListener('click', function() {
+                purchaseItem(this.getAttribute('data-item-id'));
+            });
+        });
     } catch (error) {
         console.error('Error loading marketplace items:', error);
     }
 }
 
-
-// Load items when the window loads please? 
 window.addEventListener('load', loadMarketplaceItems);
 
 async function purchaseItem(itemId) {
     try {
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' }); // Request account access
-        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price); // Fetch the price of the item
-        
-        // Call the purchaseItem function of the contract
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
+
         const receipt = await contract.methods.purchaseItem(itemId).send({
             from: accounts[0],
-            value: itemPrice, // Amount to be sent with the transaction
-            gas: 3000000 // Gas limit, adjust based on requirements
+            value: itemPrice,
+            gas: 3000000
         });
 
         console.log('Transaction receipt:', receipt);
         alert(`Item ${itemId} purchased successfully!`);
-
-        // Optionally, refresh items or make UI updates here
-        loadMarketplaceItems();
+        loadMarketplaceItems(); // Refresh items
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
-
-
-async function displayRetrievedData() {
-    try {
-        const retrievedData = await retrieveDataFromContract();
-        document.getElementById('retrievedData').textContent = `Retrieved Data: ${retrievedData}`;
-    } catch (error) {
-        console.error('Error displaying retrieved data:', error);
-    }
-}
-
 
 async function connectMetamask() {
     if (window.ethereum) {
@@ -169,12 +137,7 @@ async function connectMetamask() {
 }
 
 async function displayAccountInfo(account) {
-    try {
-        const balance = await web3.eth.getBalance(account);
-        const balanceInEther = web3.utils.fromWei(balance, 'ether');
-        document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
-    } catch (error) {
-        console.error('Error fetching account info:', error);
-    }
+    const balance = await web3.eth.getBalance(account);
+    const balanceInEther = web3.utils.fromWei(balance, 'ether');
+    document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
 }
-
