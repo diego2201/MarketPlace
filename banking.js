@@ -1,5 +1,15 @@
-const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
-const web3 = new Web3(infuraUrl);
+// Ensure web3 is initialized properly with MetaMask's provider
+if (window.ethereum) {
+    web3 = new Web3(window.ethereum);
+    try {
+        // Request account access if needed
+        await window.ethereum.request({ method: 'eth_requestAccounts' });
+    } catch (error) {
+        console.error('User denied account access:', error);
+    }
+} else {
+    console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+}
 
 const contractABI = [
     // ListNewItem
@@ -59,6 +69,7 @@ const contractABI = [
     }
 ];
 
+
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
@@ -86,7 +97,7 @@ async function loadMarketplaceItems() {
         const marketplaceItems = document.getElementById('marketplaceItems');
         marketplaceItems.innerHTML = itemsDisplay;
 
-        // Attach event listeners to buy buttons
+        // Attach event listeners to buy buttons after rendering
         marketplaceItems.querySelectorAll('.buy-button').forEach(button => {
             button.addEventListener('click', function() {
                 purchaseItem(this.getAttribute('data-item-id'));
@@ -97,93 +108,35 @@ async function loadMarketplaceItems() {
     }
 }
 
-window.addEventListener('load', loadMarketplaceItems);
-
 async function purchaseItem(itemId) {
     try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const from = accounts[0];
+        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
+        const valueHex = web3.utils.toHex(itemPrice);
 
-        // Fetch the price of the item directly from the contract
-        const item = await contract.methods.getItemDetails(itemId).call();
-        const itemPrice = item.price;
-
-        // Encode the function call to the contract
         const purchaseData = contract.methods.purchaseItem(itemId).encodeABI();
 
         const txObject = {
-            from: from,
+            from: accounts[0],
             to: contractAddress,
             data: purchaseData,
-            value: itemPrice,
+            value: valueHex,
             gas: 3000000 // Set a sufficient gas limit for the transaction
         };
 
-        // Send the transaction via MetaMask
-        const transactionHash = await ethereum.request({
+        console.log('Sending transaction:', txObject);
+        const transactionHash = await window.ethereum.request({
             method: 'eth_sendTransaction',
             params: [txObject],
         });
 
         console.log('Transaction sent. Hash:', transactionHash);
         alert(`Item ${itemId} purchased successfully!`);
-
-        // Optionally, refresh items or make UI updates here
-        loadMarketplaceItems();
+        loadMarketplaceItems(); // Optionally refresh the item list
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
 
-
-
-async function connectMetamask() {
-    if (window.ethereum) {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            console.log('Connected to MetaMask:', accounts);
-            displayAccountInfo(accounts[0]);
-            document.getElementById('connection-text').textContent = 'Connected';
-            document.getElementById('userAddress').textContent = accounts[0];
-        } catch (error) {
-            console.error('Error connecting to MetaMask:', error);
-            document.getElementById('connection-text').textContent = 'Connection failed';
-        }
-    } else {
-        console.error('MetaMask not detected or installed.');
-    }
-}
-
-async function displayAccountInfo(account) {
-    const balance = await web3.eth.getBalance(account);
-    const balanceInEther = web3.utils.fromWei(balance, 'ether');
-    document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
-}
-
-
-
-// async function setDataInContract(data) {
-//     try {
-//         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-//         const from = accounts[0];
-//         const encodedData = web3.utils.utf8ToHex(data);
-//         const defaultGasLimit = '0x300000';
-
-//         const txObject = {
-//             from: from,
-//             to: contractAddress,
-//             data: encodedData,
-//             gas: defaultGasLimit,
-//         };
-
-//         const transactionHash = await ethereum.request({
-//             method: 'eth_sendTransaction',
-//             params: [txObject],
-//         });
-
-//         console.log('Transaction sent. Hash:', transactionHash);
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// }
+window.addEventListener('load', loadMarketplaceItems);
