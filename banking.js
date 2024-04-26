@@ -43,8 +43,19 @@ const contractABI = [
         ],
         "stateMutability": "view",
         "type": "function"
+    },
+    {
+        "constant": true,
+        "inputs": [],
+        "name": "getTotalItemCount",
+        "outputs": [
+            {"name": "", "type": "uint256"}
+        ],
+        "stateMutability": "view",
+        "type": "function"
     }
 ];
+
 
 
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
@@ -78,7 +89,7 @@ async function setDataInContract(data) {
 async function loadMarketplaceItems() {
     try {
         // Use the getTotalItemCount() method instead of directly accessing nextItemId
-        const itemCount = await contract.methods.getTotalItemCount().call();
+        const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
         let itemsDisplay = '';
 
         for (let i = 1; i <= itemCount; i++) {
