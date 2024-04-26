@@ -10,22 +10,19 @@
 <body>
     <div class="banner">
         <h1>Marketplace Web3 Interface</h1>
-        <div class="connection-status">
-            <button onclick="connectMetamask()" class="metamask-button">Connect MetaMask</button>
-            <span id="connection-text">Not connected</span>
-        </div>
         <div id="accountInfo">
+            <div class="connection-status">
+                <button onclick="connectMetamask()" class="metamask-button">Connect MetaMask</button>
+                <span id="connection-text">Not connected</span>
+            </div>
             <p><strong>Address:</strong> <span id="userAddress"></span></p>
             <p><strong>Balance:</strong> <span id="userBalance"></span> ETH</p>
         </div>
     </div>
 
-    <div>
-        <input id="itemID" placeholder="Enter Item ID">
-        <button onclick="retrieveItemDetails()">Retrieve Item Details</button>
+    <div id="marketplaceItems">
+        <!-- All marketplace items will be displayed here -->
     </div>
-
-    <div id="itemDetails"></div>
 
     <script src="banking.js"></script>
 </body>

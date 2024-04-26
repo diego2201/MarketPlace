@@ -75,29 +75,36 @@ async function setDataInContract(data) {
     }
 }
 
-async function retrieveItemDetails() {
-    const itemId = document.getElementById('itemID').value;
-    if (!itemId) {
-        alert('Please enter a valid Item ID');
-        return;
-    }
+async function loadMarketplaceItems() {
     try {
-        const details = await contract.methods.getItemDetails(itemId).call();
-        const detailsDisplay = `
-            <p><strong>ID:</strong> ${details.id}</p>
-            <p><strong>Title:</strong> ${details.title}</p>
-            <p><strong>Description:</strong> ${details.description}</p>
-            <p><strong>Price:</strong> ${web3.utils.fromWei(details.price, 'ether')} ETH</p>
-            <p><strong>Owner:</strong> ${details.owner}</p>
-            <p><strong>Seller:</strong> ${details.seller}</p>
-            <p><strong>Sold:</strong> ${details.isSold ? 'Yes' : 'No'}</p>
-        `;
-        document.getElementById('itemDetails').innerHTML = detailsDisplay;
+        // Assuming nextItemId gives the count of the next item to be added, so we subtract 1 to get the total items added.
+        const itemCount = parseInt(await contract.methods.nextItemId().call(), 10) - 1;
+        let itemsDisplay = '';
+
+        for (let i = 1; i <= itemCount; i++) {
+            const item = await contract.methods.getItemDetails(i).call();
+            itemsDisplay += `
+                <div class="item">
+                    <p><strong>ID:</strong> ${item.id}</p>
+                    <p><strong>Title:</strong> ${item.title}</p>
+                    <p><strong>Description:</strong> ${item.description}</p>
+                    <p><strong>Price:</strong> ${web3.utils.fromWei(item.price, 'ether')} ETH</p>
+                    <p><strong>Owner:</strong> ${item.owner}</p>
+                    <p><strong>Seller:</strong> ${item.seller}</p>
+                    <p><strong>Sold:</strong> ${item.isSold ? 'Yes' : 'No'}</p>
+                    ${!item.isSold ? `<button onclick="purchaseItem(${item.id})">Buy</button>` : ''}
+                </div>
+            `;
+        }
+
+        document.getElementById('itemDetails').innerHTML = itemsDisplay;
     } catch (error) {
-        console.error('Error retrieving item details:', error);
-        document.getElementById('itemDetails').innerHTML = `<p>Error retrieving details. See console.</p>`;
+        console.error('Error loading marketplace items:', error);
     }
 }
+
+// Load items when the window loads
+window.addEventListener('load', loadMarketplaceItems);
 
 async function displayRetrievedData() {
     try {
