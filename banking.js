@@ -89,6 +89,7 @@ async function retrieveItemDetails() {
             <p><strong>Description:</strong> ${details.description}</p>
             <p><strong>Price:</strong> ${web3.utils.fromWei(details.price, 'ether')} ETH</p>
             <p><strong>Owner:</strong> ${details.owner}</p>
+            <p><strong>Seller:</strong> ${details.seller}</p>
             <p><strong>Sold:</strong> ${details.isSold ? 'Yes' : 'No'}</p>
         `;
         document.getElementById('itemDetails').innerHTML = detailsDisplay;
