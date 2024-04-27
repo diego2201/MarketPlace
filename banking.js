@@ -138,6 +138,7 @@ async function loadMarketplaceItems() {
                 <tbody>`;
 
         for (let i = 0; i < itemCount; i++) {
+            await sleep(10000);
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
                 <tr>
