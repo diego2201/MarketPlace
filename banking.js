@@ -118,7 +118,7 @@ const contractABI = [
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Sleep function using setTimeout to create a delay
+// Sleep function using setTimeout to create a delay to stop request error 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
