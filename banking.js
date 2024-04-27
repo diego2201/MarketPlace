@@ -1,12 +1,5 @@
-
-
-
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
 const web3 = new Web3(infuraUrl);
-
-
-
-
 
 // Make sure to define where the 'provider' is coming from, usually MetaMask's window.ethereum
 const provider = window.ethereum;
