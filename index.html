@@ -11,7 +11,7 @@
         <h1>Marketplace Web3 Interface</h1>
         <div id="accountInfo">
             <div class="connection-status">
-                <button onclick="connectMetamask()" class="metamask-button"></button>
+                <button class="metamask-button">Connect to MetaMask</button>
                 <span id="connection-text">Not connected</span>
             </div>
             <p><strong>Address:</strong> <span id="userAddress"></span></p>
@@ -19,18 +19,17 @@
         </div>
     </div>
 
-    <div id="marketplaceItems">
-        <!-- All marketplace items will be displayed here -->
-    </div>
-
     <div id="listItemForm">
         <h2>List a New Item</h2>
         <input type="text" id="itemTitle" placeholder="Item Title" required>
         <input type="text" id="itemDescription" placeholder="Item Description" required>
         <input type="text" id="itemPrice" placeholder="Item Price in Wei" required>
-        <button onclick="listNewItem()">List Item</button>
+        <button class="listItemButton">List Item</button>
     </div>
-    
+
+    <div id="marketplaceItems">
+        <!-- All marketplace items will be displayed here -->
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/web3@^1.0.0/dist/web3.min.js"></script>
     <script src="banking.js"></script>
