@@ -120,7 +120,12 @@ async function loadMarketplaceItems() {
     }
 }
 
-window.addEventListener('load', loadMarketplaceItems);
+window.addEventListener('load', function() {
+    loadMarketplaceItems();
+    document.getElementById('refreshItemsButton').addEventListener('click', function() {
+        loadMarketplaceItems(); // Reload items without refreshing the page
+    });
+});
 
 async function purchaseItem(itemId) {
     try {
