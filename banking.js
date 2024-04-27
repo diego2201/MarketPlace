@@ -1,22 +1,37 @@
+// Wait for the entire DOM to be loaded before attaching event listeners
 document.addEventListener('DOMContentLoaded', function() {
     const ethereumButton = document.querySelector('.metamask-button');
     const listItemButton = document.querySelector('.listItemButton');
     const marketplaceItems = document.getElementById('marketplaceItems');
 
-    ethereumButton.addEventListener('click', connectMetamask);
-    listItemButton.addEventListener('click', () => {
-        const title = document.getElementById('itemTitle').value;
-        const description = document.getElementById('itemDescription').value;
-        const price = document.getElementById('itemPrice').value;
-        listNewItem(title, description, price);
-    });
+    // Check if elements are correctly fetched before adding listeners
+    if (ethereumButton) {
+        ethereumButton.addEventListener('click', connectMetamask);
+    } else {
+        console.log('No Ethereum button found.');
+    }
 
-    marketplaceItems.addEventListener('click', (event) => {
-        if (event.target.classList.contains('buy-button')) {
-            const itemId = event.target.getAttribute('data-item-id');
-            purchaseItem(itemId);
-        }
-    });
+    if (listItemButton) {
+        listItemButton.addEventListener('click', () => {
+            const title = document.getElementById('itemTitle').value;
+            const description = document.getElementById('itemDescription').value;
+            const price = document.getElementById('itemPrice').value;
+            listNewItem(title, description, price);
+        });
+    } else {
+        console.log('No List Item button found.');
+    }
+
+    if (marketplaceItems) {
+        marketplaceItems.addEventListener('click', (event) => {
+            if (event.target.classList.contains('buy-button')) {
+                const itemId = event.target.getAttribute('data-item-id');
+                purchaseItem(itemId);
+            }
+        });
+    } else {
+        console.log('Marketplace items container not found.');
+    }
 
     if (window.ethereum) {
         web3 = new Web3(window.ethereum);
@@ -24,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('MetaMask is not available.');
     }
 });
+
 
 async function connectMetamask() {
     try {
