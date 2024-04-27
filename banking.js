@@ -1,91 +1,56 @@
-const ethereumButton = document.querySelector(".enableEthereumButton");
-const listItemButton = document.querySelector(".listItemButton");
-const purchaseItemButton = document.querySelector(".purchaseItemButton");
+document.addEventListener('DOMContentLoaded', function() {
+    const ethereumButton = document.querySelector('.metamask-button');
+    const listItemButton = document.querySelector('.listItemButton');
+    const marketplaceItems = document.getElementById('marketplaceItems');
 
-let accounts = [];
+    ethereumButton.addEventListener('click', connectMetamask);
+    listItemButton.addEventListener('click', () => {
+        const title = document.getElementById('itemTitle').value;
+        const description = document.getElementById('itemDescription').value;
+        const price = document.getElementById('itemPrice').value;
+        listNewItem(title, description, price);
+    });
 
-// Initialization and event listeners
-ethereumButton.addEventListener("click", () => {
-    connectMetamask();
-});
+    marketplaceItems.addEventListener('click', (event) => {
+        if (event.target.classList.contains('buy-button')) {
+            const itemId = event.target.getAttribute('data-item-id');
+            purchaseItem(itemId);
+        }
+    });
 
-listItemButton.addEventListener("click", () => {
-    const itemId = 1; // Assuming you fetch this or set dynamically
-    listNewItem('Sample Item', 'Description here', '10000000000000000'); // Example data
-});
-
-purchaseItemButton.addEventListener("click", () => {
-    const itemId = purchaseItemButton.getAttribute('data-item-id'); // Get item ID
-    purchaseItem(itemId);
+    if (window.ethereum) {
+        web3 = new Web3(window.ethereum);
+    } else {
+        console.log('MetaMask is not available.');
+    }
 });
 
 async function connectMetamask() {
-    if (window.ethereum) {
-        try {
-            accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
-            console.log('Connected to MetaMask:', accounts);
-        } catch (error) {
-            console.error('Error connecting to MetaMask:', error);
-        }
-    } else {
-        console.error('MetaMask is not available.');
+    try {
+        await window.ethereum.request({ method: "eth_requestAccounts" });
+        console.log('Connected to MetaMask');
+    } catch (error) {
+        console.error('Error connecting to MetaMask:', error);
     }
 }
 
 async function listNewItem(title, description, price) {
-    if (!window.ethereum || !accounts.length) {
-        alert("Please connect to MetaMask first.");
-        return;
-    }
-
     try {
-        const receipt = await contract.methods.listNewItem(title, description, price).send({
-            from: accounts[0],
-            gas: '3000000'  // Adjust the gas limit as necessary
-        });
-
+        const from = await window.ethereum.request({ method: "eth_requestAccounts" }).then(accounts => accounts[0]);
+        const receipt = await contract.methods.listNewItem(title, description, price).send({ from: from });
         console.log('Item listed successfully:', receipt);
-        alert('Item listed successfully!');
     } catch (error) {
         console.error('Error listing item:', error);
-        alert(`Failed to list item: ${error.message}`);
     }
 }
 
 async function purchaseItem(itemId) {
-    if (!window.ethereum || !accounts.length) {
-        alert("Please connect to MetaMask first.");
-        return;
-    }
-
     try {
-        const item = await contract.methods.getItemDetails(itemId).call();
-        const receipt = await window.ethereum.request({
-            method: "eth_sendTransaction",
-            params: [{
-                from: accounts[0],
-                to: contractAddress,
-                value: web3.utils.toHex(item.price),  // Ensure value is in hex
-                gas: '3000000'  // Adjust the gas limit as necessary
-            }]
-        });
-
+        const from = await window.ethereum.request({ method: "eth_requestAccounts" }).then(accounts => accounts[0]);
+        const itemDetails = await contract.methods.getItemDetails(itemId).call();
+        const receipt = await contract.methods.purchaseItem(itemId).send({ from: from, value: itemDetails.price });
         console.log('Purchase successful:', receipt);
-        alert(`Item ${itemId} purchased successfully!`);
     } catch (error) {
         console.error('Error purchasing item:', error);
-        alert(`Failed to purchase item: ${error.message}`);
     }
 }
-
-document.querySelector('.metamask-button').addEventListener('click', connectMetamask);
-document.querySelector('.listItemButton').addEventListener('click', listNewItem);
-
-// Assuming each item's buy button is dynamically generated and added
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('marketplaceItems').addEventListener('click', (event) => {
-        if (event.target.classList.contains('buy-button')) {
-            purchaseItem(event.target.dataset.itemId);
-        }
-    });
-});
