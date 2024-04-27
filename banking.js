@@ -129,8 +129,8 @@ async function loadMarketplaceItems() {
                         <th>Title</th>
                         <th>Description</th>
                         <th>Price (ETH)</th>
-                        <th>Owner</th>
                         <th>Seller</th>
+                        <th>Owner</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
@@ -145,8 +145,8 @@ async function loadMarketplaceItems() {
                     <td>${item.title}</td>
                     <td>${item.description}</td>
                     <td>${web3.utils.fromWei(item.price, 'ether')}</td>
-                    <td>${item.owner}</td>
                     <td>${item.seller}</td>
+                    <td>${item.owner}</td>
                     <td>${item.isSold ? 'Sold' : 'Available'}</td>
                     <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
                 </tr>
@@ -173,24 +173,54 @@ window.addEventListener('load', loadMarketplaceItems);
 
 async function purchaseItem(itemId) {
     try {
+        // Request account access from MetaMask
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const from = accounts[0];
 
-        const itemPrice = await contract.methods.getItemDetails(itemId).call().then(item => item.price);
+        // Instead of using contract.methods.call(), which might use Infura depending on your Web3 setup,
+        // use MetaMask's request method to make the call directly through the user's wallet extension.
+        // This assumes that `contract` is a web3.eth.Contract instance initialized with MetaMask's provider.
 
-        // Send the purchase transaction
-        const receipt = await contract.methods.purchaseItem(itemId).send({
-            from: from,
-            value: itemPrice
+        // Encode the call to the method getItemDetails
+        const data = contract.methods.getItemDetails(itemId).encodeABI();
+
+        // Use MetaMask to call the contract and get the item details
+        const itemDetails = await window.ethereum.request({
+            method: 'eth_call',
+            params: [{
+                to: contract.options.address,
+                data: data
+            }],
+            from: from
         });
 
-        console.log('Purchase successful:', receipt);
-        alert(`Item ${itemId} purchased successfully!`);
+        // Decode the returned data from the call
+        const decodedItemDetails = web3.eth.abi.decodeParameters(['uint256', 'address', 'address', 'string', 'string', 'uint256', 'bool'], itemDetails);
+        const itemPrice = decodedItemDetails[5];
+
+        // Send the purchase transaction
+        const txParams = {
+            from: from,
+            to: contract.options.address,
+            data: contract.methods.purchaseItem(itemId).encodeABI(),
+            value: web3.utils.toHex(itemPrice), // Convert the price to hex value
+            gas: web3.utils.toHex(await contract.methods.purchaseItem(itemId).estimateGas({ from: from, value: itemPrice })),
+        };
+
+        // Use MetaMask to send the transaction
+        const transactionHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txParams],
+        });
+
+        console.log('Purchase successful:', transactionHash);
+        alert(`Item ${itemId} purchased successfully! Transaction Hash: ${transactionHash}`);
     } catch (error) {
         console.error('Error purchasing item:', error);
         alert(`Failed to purchase item: ${error.message}`);
     }
 }
+
 
 
 async function listNewItem() {
