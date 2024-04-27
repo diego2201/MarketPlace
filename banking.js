@@ -255,57 +255,28 @@ async function listNewItem() {
 }
 
 
-// Function to fetch and display account info
-async function displayAccountInfo(account) {
-    try {
-        // Fetch the balance of the account
-        const balanceWei = await window.ethereum.request({
-            method: 'eth_getBalance',
-            params: [account, 'latest'] // 'latest' specifies that we want the latest balance
-        });
-
-        // Convert the balance from Wei to Ether
-        const balanceInEth = web3.utils.fromWei(balanceWei, 'ether');
-
-        // Update the balance in the UI
-        document.getElementById('userBalance').textContent = `${parseFloat(balanceInEth).toFixed(4)} ETH`;
-    } catch (error) {
-        console.error('Error fetching account info:', error);
-    }
-}
-
-// Populate dropdown and add event listener for account selection
 async function connectMetamask() {
-    try {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        const addressSelect = document.getElementById('addressSelect');
-        addressSelect.innerHTML = '';
-
-        accounts.forEach(account => {
-            const option = document.createElement('option');
-            option.value = account;
-            option.textContent = account; // Optionally, shorten the display with account.substring(0, 6) + '...';
-            addressSelect.appendChild(option);
-        });
-
-        if (accounts.length > 0) {
-            // Set initial displayed address and balance
+    if (window.ethereum) {
+        try {
+            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+            console.log('Connected to MetaMask:', accounts);
             displayAccountInfo(accounts[0]);
+            document.getElementById('connection-text').textContent = 'Connected';
+            document.getElementById('userAddress').textContent = accounts[0];
+        } catch (error) {
+            console.error('Error connecting to MetaMask:', error);
+            document.getElementById('connection-text').textContent = 'Connection failed';
         }
-
-        // Event listener for when the user selects a different account
-        addressSelect.addEventListener('change', (event) => {
-            displayAccountInfo(event.target.value);
-        });
-
-    } catch (error) {
-        console.error('Error connecting to MetaMask:', error);
+    } else {
+        console.error('MetaMask not detected or installed.');
     }
 }
 
-// Call connectMetamask when the window loads
-window.addEventListener('load', connectMetamask);
-
+async function displayAccountInfo(account) {
+    const balance = await web3.eth.getBalance(account);
+    const balanceInEther = web3.utils.fromWei(balance, 'ether');
+    document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
+}
 
 
 
