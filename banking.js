@@ -1,6 +1,61 @@
 const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
 const web3 = new Web3(infuraUrl);
 
+// Make sure to define where the 'provider' is coming from, usually MetaMask's window.ethereum
+const provider = window.ethereum;
+const ethereumButton = document.querySelector(".enableEthereumButton");
+const sendEthButton = document.querySelector(".sendEthButton");
+
+let accounts = [];
+
+// Ensure the buttons exist before adding event listeners
+if (ethereumButton && sendEthButton) {
+  ethereumButton.addEventListener("click", () => {
+    getAccount();
+  });
+
+  sendEthButton.addEventListener("click", () => {
+    if (!accounts.length) {
+      console.error('No accounts available.');
+      return;
+    }
+
+    // Example recipient address and value, replace these with actual data
+    const recipientAddress = '0xDB4333393C594D3B03919a6385F721bF96ecf5B7'; // Replace with actual recipient Ethereum address
+    const valueToSend = '1000000000000000000'; // 1 Ether in wei
+
+    provider.request({
+      method: "eth_sendTransaction",
+      params: [{
+        from: accounts[0],
+        to: recipientAddress,
+        value: valueToSend,
+        gasLimit: '0x5028', // Adjust as necessary
+        maxPriorityFeePerGas: '0x3B9ACA00', // 1 Gwei
+        maxFeePerGas: '0x2540BE400' // 10 Gwei
+      }]
+    })
+    .then((txHash) => console.log("Transaction Hash:", txHash))
+    .catch((error) => console.error("Transaction Error:", error));
+  });
+
+} else {
+  console.error('Buttons not found.');
+}
+
+async function getAccount() {
+  if (provider) {
+    try {
+      accounts = await provider.request({ method: "eth_requestAccounts" });
+      console.log("Accounts fetched:", accounts);
+    } catch (error) {
+      console.error("Error fetching accounts:", error);
+    }
+  } else {
+    console.log('Ethereum provider is not available.');
+  }
+}
+
 
 const contractABI = [
     // ListNewItem
