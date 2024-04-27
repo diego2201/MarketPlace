@@ -127,13 +127,13 @@ async function loadMarketplaceItems() {
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
                 <div class="item">
+                    <h3>${item.title}</h3>  <!-- Title as header -->
                     <p><strong>ID:</strong> ${item.id}</p>
-                    <p><strong>Title:</strong> ${item.title}</p>
                     <p><strong>Description:</strong> ${item.description}</p>
                     <p><strong>Price:</strong> ${web3.utils.fromWei(item.price, 'ether')} ETH</p>
                     <p><strong>Owner:</strong> ${item.owner}</p>
                     <p><strong>Seller:</strong> ${item.seller}</p>
-                    <p><strong>Sold:</strong> ${item.isSold ? 'Yes' : 'No'}</p>
+                    <p><strong>Status:</strong> ${item.isSold ? 'Sold' : 'Available'}</p>
                     ${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : ''}
                 </div>
             `;
@@ -152,6 +152,7 @@ async function loadMarketplaceItems() {
         console.error('Error loading marketplace items:', error);
     }
 }
+
 
 window.addEventListener('load', loadMarketplaceItems);
 
