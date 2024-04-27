@@ -256,21 +256,43 @@ async function listNewItem() {
 
 
 async function connectMetamask() {
-    if (window.ethereum) {
-        try {
-            const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-            console.log('Connected to MetaMask:', accounts);
-            displayAccountInfo(accounts[0]);
-            document.getElementById('connection-text').textContent = 'Connected';
+    try {
+        // Request account access from MetaMask
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Get the dropdown element
+        const addressSelect = document.getElementById('addressSelect');
+        addressSelect.innerHTML = ''; // Clear existing options
+
+        // Populate the dropdown with the accounts
+        accounts.forEach(account => {
+            const option = document.createElement('option');
+            option.value = account;
+            option.textContent = account;
+            addressSelect.appendChild(option);
+        });
+
+        // Set the text content to the first account by default
+        if (accounts.length > 0) {
             document.getElementById('userAddress').textContent = accounts[0];
-        } catch (error) {
-            console.error('Error connecting to MetaMask:', error);
-            document.getElementById('connection-text').textContent = 'Connection failed';
+            document.getElementById('connection-text').textContent = 'Connected';
+            displayAccountInfo(accounts[0]); // Update balance display
         }
-    } else {
-        console.error('MetaMask not detected or installed.');
+    } catch (error) {
+        console.error('Error connecting to MetaMask:', error);
+        document.getElementById('connection-text').textContent = 'Connection failed';
     }
 }
+
+// Add event listener for account selection change
+document.getElementById('addressSelect').addEventListener('change', function() {
+    const selectedAccount = this.value;
+    displayAccountInfo(selectedAccount); // Update balance display for the selected account
+});
+
+// Call `connectMetamask` on window load or on a button click event
+window.addEventListener('load', connectMetamask);
+
 
 async function displayAccountInfo(account) {
     const balance = await web3.eth.getBalance(account);
