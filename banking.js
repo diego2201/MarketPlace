@@ -118,6 +118,12 @@ const contractABI = [
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
+// Sleep function using setTimeout to create a delay
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+
 async function loadMarketplaceItems() {
     try {
         const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
@@ -138,7 +144,9 @@ async function loadMarketplaceItems() {
                 <tbody>`;
 
         for (let i = 0; i < itemCount; i++) {
-            await sleep(10000);
+            // Use the sleep function to delay the loop execution
+            await sleep(1000); // Delays the next iteration by 1000 milliseconds (1 second)
+
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
                 <tr>
