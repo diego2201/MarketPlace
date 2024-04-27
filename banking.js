@@ -121,29 +121,43 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 async function loadMarketplaceItems() {
     try {
         const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
-        let itemsDisplay = '';
+        let itemsDisplay = `
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Price (ETH)</th>
+                        <th>Owner</th>
+                        <th>Seller</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
         for (let i = 0; i < itemCount; i++) {
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
-                <div class="item">
-                    <h3>${item.title}</h3>  <!-- Title as header -->
-                    <p><strong>ID:</strong> ${item.id}</p>
-                    <p><strong>Description:</strong> ${item.description}</p>
-                    <p><strong>Price:</strong> ${web3.utils.fromWei(item.price, 'ether')} ETH</p>
-                    <p><strong>Owner:</strong> ${item.owner}</p>
-                    <p><strong>Seller:</strong> ${item.seller}</p>
-                    <p><strong>Status:</strong> ${item.isSold ? 'Sold' : 'Available'}</p>
-                    ${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : ''}
-                </div>
+                <tr>
+                    <td>${item.id}</td>
+                    <td>${item.title}</td>
+                    <td>${item.description}</td>
+                    <td>${web3.utils.fromWei(item.price, 'ether')}</td>
+                    <td>${item.owner}</td>
+                    <td>${item.seller}</td>
+                    <td>${item.isSold ? 'Sold' : 'Available'}</td>
+                    <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
+                </tr>
             `;
         }
 
-        const marketplaceItems = document.getElementById('marketplaceItems');
-        marketplaceItems.innerHTML = itemsDisplay;
+        itemsDisplay += `</tbody></table>`;
+        document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
 
         // Attach event listeners to buy buttons
-        marketplaceItems.querySelectorAll('.buy-button').forEach(button => {
+        document.querySelectorAll('.buy-button').forEach(button => {
             button.addEventListener('click', function() {
                 purchaseItem(this.getAttribute('data-item-id'));
             });
@@ -152,6 +166,7 @@ async function loadMarketplaceItems() {
         console.error('Error loading marketplace items:', error);
     }
 }
+
 
 
 window.addEventListener('load', loadMarketplaceItems);

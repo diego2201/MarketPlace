@@ -40,3 +40,35 @@
     margin-bottom: 10px; /* Adds space between items */
     background-color: #f9f9f9; /* Light gray background for each item */
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.buy-button {
+    padding: 5px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.buy-button:hover {
+    background-color: #45a049;
+}
+
