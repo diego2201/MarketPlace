@@ -21,7 +21,7 @@ if (ethereumButton && sendEthButton) {
     }
 
     // Example recipient address and value, replace these with actual data
-    const recipientAddress = '0x123...'; // Replace with actual recipient Ethereum address
+    const recipientAddress = '0xDB4333393C594D3B03919a6385F721bF96ecf5B7'; // Replace with actual recipient Ethereum address
     const valueToSend = '1000000000000000000'; // 1 Ether in wei
 
     provider.request({
@@ -55,11 +55,6 @@ async function getAccount() {
     console.log('Ethereum provider is not available.');
   }
 }
-
-
-
-
-
 
 
 const contractABI = [
