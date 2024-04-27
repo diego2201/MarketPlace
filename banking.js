@@ -89,7 +89,7 @@ async function loadMarketplaceItems() {
 
         for (let i = 0; i < itemCount; i++) {
             // Use the sleep function to delay the loop execution
-            await sleep(1000); // Delays the next iteration by 1000 milliseconds (1 second)
+            await sleep(800); // Delays the next iteration by 1000 milliseconds (1 second)
 
             const item = await contract.methods.getItemDetails(i).call();
             itemsDisplay += `
