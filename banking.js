@@ -120,8 +120,6 @@ async function loadMarketplaceItems() {
     }
 }
 
-
-
 window.addEventListener('load', loadMarketplaceItems);
 
 async function purchaseItem(itemId) {
@@ -180,24 +178,38 @@ async function listNewItem() {
     try {
         const title = document.getElementById('itemTitle').value;
         const description = document.getElementById('itemDescription').value;
-        const price = document.getElementById('itemPrice').value;
+        const price = document.getElementById('itemPrice').value; // Ensure this is in wei before passing
 
         if (!title || !description || !price) {
             alert('Please fill in all fields');
             return;
         }
 
+        // Request account access from MetaMask
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const from = accounts[0];
 
-        // Call the listNewItem function of the contract
-        const receipt = await contract.methods.listNewItem(title, description, price).send({
-            from: from
+        // Encode the ABI for the listNewItem function call
+        const data = contract.methods.listNewItem(title, description, price).encodeABI();
+
+        // Prepare transaction parameters
+        const txParams = {
+            from: from,
+            to: contract.options.address,
+            data: data,
+            gas: web3.utils.toHex(await contract.methods.listNewItem(title, description, price).estimateGas({ from: from })),
+        };
+
+        // Send the transaction using MetaMask
+        const txHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txParams],
         });
 
-        console.log('Item listed successfully:', receipt);
-        alert('Item listed successfully!');
-        // Clear inputs after successful listing
+        console.log('Item listed successfully:', txHash);
+        alert(`Item listed successfully! Transaction Hash: ${txHash}`);
+
+        // Optionally, clear inputs after successful transaction
         document.getElementById('itemTitle').value = '';
         document.getElementById('itemDescription').value = '';
         document.getElementById('itemPrice').value = '';
@@ -206,6 +218,7 @@ async function listNewItem() {
         alert(`Failed to list item: ${error.message}`);
     }
 }
+
 
 
 async function connectMetamask() {
