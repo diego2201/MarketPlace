@@ -313,13 +313,6 @@ async function displayAccountInfo(account) {
 document.addEventListener('DOMContentLoaded', connectMetamask);
 
 
-async function displayAccountInfo(account) {
-    const balance = await web3.eth.getBalance(account);
-    const balanceInEther = web3.utils.fromWei(balance, 'ether');
-    document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
-}
-
-
 
 // async function setDataInContract(data) {
 //     try {
