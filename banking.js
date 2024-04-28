@@ -59,20 +59,20 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 async function loadMarketplaceItems() {
     const itemCount = await contract.methods.getTotalItemCount().call();
     let itemsDisplay = `
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Price (ETH)</th>
-                    <th>Seller</th>
-                    <th>Owner</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>`;
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Price (ETH)</th>
+                        <th>Seller</th>
+                        <th>Owner</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>`;
 
     for (let i = 0; i < itemCount; i++) {
         const item = await contract.methods.getItemDetails(i).call();
@@ -89,7 +89,7 @@ async function loadMarketplaceItems() {
             </tr>`;
     }
 
-    itemsDisplay += `</tbody></table>`;
+    itemsDisplay += "</tbody></table>";
     document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
 
     document.querySelectorAll('.buy-button').forEach(button => {
@@ -98,32 +98,6 @@ async function loadMarketplaceItems() {
         });
     });
 }
-
-function subscribeToEvents() {
-    contract.events.ItemListed({
-        fromBlock: 'latest'
-    })
-    .on('data', event => {
-        console.log('New item listed:', event);
-        loadMarketplaceItems();
-    })
-    .on('error', console.error);
-
-    contract.events.ItemPurchased({
-        fromBlock: 'latest'
-    })
-    .on('data', event => {
-        console.log('Item purchased:', event);
-        loadMarketplaceItems();
-    })
-    .on('error', console.error);
-}
-
-window.addEventListener('load', function() {
-    loadMarketplaceItems();
-    subscribeToEvents();
-    document.getElementById('refreshItemsButton').addEventListener('click', loadMarketplaceItems);
-});
 
 
 async function purchaseItem(itemId) {
