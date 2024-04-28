@@ -67,6 +67,27 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function subscribeToEvents() {
+    contract.events.ItemListed({
+        fromBlock: 'latest'
+    })
+    .on('data', event => {
+        console.log('New item listed:', event);
+        loadMarketplaceItems();
+    })
+    .on('error', error => console.error('Error listening to ItemListed events:', error));
+
+    contract.events.ItemPurchased({
+        fromBlock: 'latest'
+    })
+    .on('data', event => {
+        console.log('Item purchased:', event);
+        loadMarketplaceItems();
+    })
+    .on('error', error => console.error('Error listening to ItemPurchased events:', error));
+}
+
+
 
 async function loadMarketplaceItems() {
     try {
@@ -122,9 +143,7 @@ async function loadMarketplaceItems() {
 
 window.addEventListener('load', function() {
     loadMarketplaceItems();
-    document.getElementById('refreshItemsButton').addEventListener('click', function() {
-        loadMarketplaceItems(); // Reload items without refreshing the page
-    });
+    subscribeToEvents();
 });
 
 async function purchaseItem(itemId) {
@@ -248,32 +267,3 @@ async function displayAccountInfo(account) {
     const balanceInEther = web3.utils.fromWei(balance, 'ether');
     document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
 }
-
-
-
-// async function setDataInContract(data) {
-//     try {
-//         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-//         const from = accounts[0];
-//         const encodedData = web3.utils.utf8ToHex(data);
-//         const defaultGasLimit = '0x300000';
-
-//         const txObject = {
-//             from: from,
-//             to: contractAddress,
-//             data: encodedData,
-//             gas: defaultGasLimit,
-//         };
-
-//         const transactionHash = await ethereum.request({
-//             method: 'eth_sendTransaction',
-//             params: [txObject],
-//         });
-
-//         console.log('Transaction sent. Hash:', transactionHash);
-//     } catch (error) {
-//         console.error('Error:', error);
-//     }
-// }
-
-
