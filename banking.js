@@ -99,6 +99,10 @@ async function loadMarketplaceItems() {
     });
 }
 
+window.addEventListener('load', function() {
+    loadMarketplaceItems(); // Automatically load items when the page loads
+});
+
 
 async function purchaseItem(itemId) {
     try {
