@@ -58,17 +58,41 @@ const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 async function loadMarketplaceItems() {
     const itemCount = await contract.methods.getTotalItemCount().call();
-    let itemsDisplay = "<table><thead><tr><th>ID</th><th>Title</th><th>Description</th><th>Price (ETH)</th><th>Seller</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody>";
+    let itemsDisplay = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Price (ETH)</th>
+                    <th>Seller</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>`;
 
     for (let i = 0; i < itemCount; i++) {
         const item = await contract.methods.getItemDetails(i).call();
-        itemsDisplay += `<tr><td>${item.id}</td><td>${item.title}</td><td>${item.description}</td><td>${web3.utils.fromWei(item.price, 'ether')}</td><td>${item.seller}</td><td>${item.owner}</td><td>${item.isSold ? 'Sold' : 'Available'}</td><td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td></tr>`;
+        itemsDisplay += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.title}</td>
+                <td>${item.description}</td>
+                <td>${web3.utils.fromWei(item.price, 'ether')}</td>
+                <td>${item.seller}</td>
+                <td>${item.owner}</td>
+                <td>${item.isSold ? 'Sold' : 'Available'}</td>
+                <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
+            </tr>`;
     }
 
-    itemsDisplay += "</tbody></table>";
+    itemsDisplay += `</tbody></table>`;
     document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
 
-    Array.from(document.getElementsByClassName('buy-button')).forEach(button => {
+    document.querySelectorAll('.buy-button').forEach(button => {
         button.addEventListener('click', function() {
             purchaseItem(this.getAttribute('data-item-id'));
         });
@@ -77,19 +101,19 @@ async function loadMarketplaceItems() {
 
 function subscribeToEvents() {
     contract.events.ItemListed({
-        fromBlock: 0
+        fromBlock: 'latest'
     })
-    .on('data', function(event) {
-        console.log('New item listed:', event.returnValues);
+    .on('data', event => {
+        console.log('New item listed:', event);
         loadMarketplaceItems();
     })
     .on('error', console.error);
 
     contract.events.ItemPurchased({
-        fromBlock: 0
+        fromBlock: 'latest'
     })
-    .on('data', function(event) {
-        console.log('Item purchased:', event.returnValues);
+    .on('data', event => {
+        console.log('Item purchased:', event);
         loadMarketplaceItems();
     })
     .on('error', console.error);
@@ -98,9 +122,8 @@ function subscribeToEvents() {
 window.addEventListener('load', function() {
     loadMarketplaceItems();
     subscribeToEvents();
+    document.getElementById('refreshItemsButton').addEventListener('click', loadMarketplaceItems);
 });
-
-// Implementation of purchaseItem, listNewItem, connectMetamask, and displayAccountInfo would remain unchanged from your current setup
 
 
 async function purchaseItem(itemId) {
