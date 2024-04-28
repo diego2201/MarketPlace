@@ -1,8 +1,6 @@
-const infuraUrl = 'https://sepolia.infura.io/v3/fab7e80127424a7c95aadd5be9c525e1';
-const web3 = new Web3(infuraUrl);
+const web3 = new Web3(window.ethereum);
 
 const contractABI = [
-    // ListNewItem
     {
         "constant": false,
         "inputs": [
@@ -15,7 +13,6 @@ const contractABI = [
         "stateMutability": "nonpayable",
         "type": "function"
     },
-    // PurchaseItem
     {
         "constant": false,
         "inputs": [
@@ -27,7 +24,6 @@ const contractABI = [
         "stateMutability": "payable",
         "type": "function"
     },
-    // GetItemDetails
     {
         "constant": true,
         "inputs": [
@@ -46,105 +42,66 @@ const contractABI = [
         "stateMutability": "view",
         "type": "function"
     },
-    // GetTotalItemCount
     {
         "constant": true,
         "inputs": [],
         "name": "getTotalItemCount",
-        "outputs": [
-            {"name": "", "type": "uint256"}
-        ],
+        "outputs": [{"name": "", "type": "uint256"}],
         "stateMutability": "view",
         "type": "function"
     }
 ];
 
-const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
+//const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
+const contractAddress = '0xeE1Ab6F5aD7c60cdFcc5f8d334E85F98fBCEcCb2';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Sleep function using setTimeout to create a delay to stop request error 
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+async function loadMarketplaceItems() {
+    const itemCount = await contract.methods.getTotalItemCount().call();
+    let itemsDisplay = "<table><thead><tr><th>ID</th><th>Title</th><th>Description</th><th>Price (ETH)</th><th>Seller</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody>";
+
+    for (let i = 0; i < itemCount; i++) {
+        const item = await contract.methods.getItemDetails(i).call();
+        itemsDisplay += `<tr><td>${item.id}</td><td>${item.title}</td><td>${item.description}</td><td>${web3.utils.fromWei(item.price, 'ether')}</td><td>${item.seller}</td><td>${item.owner}</td><td>${item.isSold ? 'Sold' : 'Available'}</td><td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td></tr>`;
+    }
+
+    itemsDisplay += "</tbody></table>";
+    document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
+
+    Array.from(document.getElementsByClassName('buy-button')).forEach(button => {
+        button.addEventListener('click', function() {
+            purchaseItem(this.getAttribute('data-item-id'));
+        });
+    });
 }
 
 function subscribeToEvents() {
     contract.events.ItemListed({
-        fromBlock: 'latest'
+        fromBlock: 0
     })
-    .on('data', event => {
-        console.log('New item listed:', event);
+    .on('data', function(event) {
+        console.log('New item listed:', event.returnValues);
         loadMarketplaceItems();
     })
-    .on('error', error => console.error('Error listening to ItemListed events:', error));
+    .on('error', console.error);
 
     contract.events.ItemPurchased({
-        fromBlock: 'latest'
+        fromBlock: 0
     })
-    .on('data', event => {
-        console.log('Item purchased:', event);
+    .on('data', function(event) {
+        console.log('Item purchased:', event.returnValues);
         loadMarketplaceItems();
     })
-    .on('error', error => console.error('Error listening to ItemPurchased events:', error));
-}
-
-
-
-async function loadMarketplaceItems() {
-    try {
-        const itemCount = parseInt(await contract.methods.getTotalItemCount().call(), 10);
-        let itemsDisplay = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Price (ETH)</th>
-                        <th>Seller</th>
-                        <th>Owner</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>`;
-
-        for (let i = 0; i < itemCount; i++) {
-            // Use the sleep function to delay the loop execution
-            await sleep(100); // Delays the next iteration by 1000 milliseconds (1 second)
-
-            const item = await contract.methods.getItemDetails(i).call();
-            itemsDisplay += `
-                <tr>
-                    <td>${item.id}</td>
-                    <td>${item.title}</td>
-                    <td>${item.description}</td>
-                    <td>${web3.utils.fromWei(item.price, 'ether')}</td>
-                    <td>${item.seller}</td>
-                    <td>${item.owner}</td>
-                    <td>${item.isSold ? 'Sold' : 'Available'}</td>
-                    <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
-                </tr>
-            `;
-        }
-
-        itemsDisplay += `</tbody></table>`;
-        document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
-
-        // Attach event listeners to buy buttons
-        document.querySelectorAll('.buy-button').forEach(button => {
-            button.addEventListener('click', function() {
-                purchaseItem(this.getAttribute('data-item-id'));
-            });
-        });
-    } catch (error) {
-        console.error('Error loading marketplace items:', error);
-    }
+    .on('error', console.error);
 }
 
 window.addEventListener('load', function() {
     loadMarketplaceItems();
     subscribeToEvents();
 });
+
+// Implementation of purchaseItem, listNewItem, connectMetamask, and displayAccountInfo would remain unchanged from your current setup
+
 
 async function purchaseItem(itemId) {
     try {
