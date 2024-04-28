@@ -52,8 +52,8 @@ const contractABI = [
     }
 ];
 
-//const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
-const contractAddress = '0xeE1Ab6F5aD7c60cdFcc5f8d334E85F98fBCEcCb2';
+const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
+//const contractAddress = '0xeE1Ab6F5aD7c60cdFcc5f8d334E85F98fBCEcCb2';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 async function loadMarketplaceItems() {
@@ -199,7 +199,6 @@ async function listNewItem() {
         alert(`Failed to list item: ${error.message}`);
     }
 }
-
 
 
 async function connectMetamask() {
