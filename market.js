@@ -98,7 +98,7 @@ function checkItemCount() {
         .catch(console.error);
 }
 
-setInterval(checkItemCount, 10000); // Poll every 10 seconds
+setInterval(checkItemCount, 5000); // Poll every 5 seconds
 
 window.addEventListener('load', loadMarketplaceItems);
 
