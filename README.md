@@ -13,9 +13,9 @@ Now you will be able to interact with the website! <br />
 The MarketPlace.sol is the contract created that our website uses to interact with the Etherum network. It is designed to manage this DApp marketplace where items can be listed, sold, and purchased. The contract includes struct data structures (Item and Account) to keep track of each item's properties (such as its ID number, the name, any additional descriptions, its listing price, seller's address, owner's address, and its sold status) and each account information (such as their current balance and their purchased items). It uses mappings to link item IDs to their details and user addresses to their accounts. The contract allows users to list new items for sale and purchase available items while ensuring transactions are valid through various checks. Events are emitted for item purchases and for debugging purposes to log important state changes and financial transactions. This helps with the frontend integration. <br /><br />
 
 <strong>MarketPlace.sol</strong>
-* `listNewItem(string memory _title, string memory _description, uint256 _price)`
-* `purchaseItem(uint256 itemId)`
-* `getItemDetails(uint256 itemId)`
-* `getTotalItemCount()`
+* `listNewItem(string memory _title, string memory _description, uint256 _price)` This method initializes a new Item struct with provided details and sets the seller and initial owner to the message sender. It then increments the counter for the next item ID.
+* `purchaseItem(uint256 itemId)` This method transfers ownership of the item to the buyer, marks it as sold, and updates the buyer's account balance. The sale amount is transferred to the seller's account. Emits an event for each purchase and logs debug information.
+* `getItemDetails(uint256 itemId)` The function returns all attributes of the Item struct, including ID, seller, owner, title, description, price, and sold status. makes sure to chec that the requested item does in fact exists.
+* `getTotalItemCount()` This method returns the total number of items listed in the marketplace.
 
 npm install web3  
