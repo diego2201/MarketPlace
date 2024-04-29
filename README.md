@@ -30,6 +30,7 @@ This file contains most of the functions that help interact with the smart contr
 * `listNewItem()`: Allows a user to list a new item for sale in the marketplace. It collects item details from the user input, validates them, and sends a transaction to the smart contract to create a new item entry. It also handles user authentication via MetaMask and estimates the necessary gas for the transaction.
 * `connectMetamask()`: Connects to the MetaMask wallet to authenticate the user and fetch their account details. It ensures the user can interact with the smart contract by confirming that they are logged into MetaMask and displaying their address and connection status.
 * `displayAccountInfo(account)`: Displays the Ethereum account balance of the connected MetaMask user. It fetches the balance, converts it from wei to ether for readability, and updates the user interface with the current balance information.
+<br />
 
 <strong>index.html</strong> <br />
 This HTML structure provides a user-friendly interface to interact with a blockchain-based marketplace, leveraging Web3 technologies to handle transactions and account management seamlessly in a decentralized environment. <br />
@@ -48,38 +49,25 @@ A container where all marketplace items are dynamically displayed. This area is 
 Scripts: <br />
 * `Web3.js Import`: Includes the Web3.js library from a content delivery network (CDN), which is essential for interacting with Ethereum blockchain directly from the browser.
 * `Custom JavaScript File (market.js)`: Contains the logic to interact with the Ethereum blockchain using the smart contract's ABI and address. It handles UI updates based on blockchain interactions like listing items, purchasing, and displaying account balances.
+<br />
 
+
+* ``:
 
 <strong>styles.css</strong> <br />
-.banner:
-Sets a dark red background color and white text.
-Applies flexbox layout, stacking child elements vertically and aligning them to the start (left side).
-Adds padding around the content within the banner for spacing.
-.banner h1:
-Removes the default margin from the h1 element to allow for tighter spacing control within the banner.
-.connection-status:
-Uses flexbox to lay out child elements horizontally and center-aligns them vertically.
+* `.banner`: Sets a dark red background color and white text.
+Applies flexbox layout, stacking child elements vertically and aligning them to the start (left side). Adds padding around the content within the banner for spacing.
+* `.banner h1`: Removes the default margin from the h1 element to allow for tighter spacing control within the banner.
+* `.connection-status`: Uses flexbox to lay out child elements horizontally and center-aligns them vertically.
 Adds a margin below itself for spacing between the connection status and the account info.
-.metamask-button:
-Displays the MetaMask logo as a background image, covering the button entirely.
-Sets specific dimensions for the button and removes the border for a cleaner appearance.
-Changes the cursor to a pointer to indicate it's clickable and adds a right margin for spacing from adjacent text.
-#accountInfo p:
-Removes default margins from paragraphs within the account information section for uniform alignment.
+* `.metamask-button`: Displays the MetaMask logo as a background image, covering the button entirely. Sets specific dimensions for the button and removes the border for a cleaner appearance. Changes the cursor to a pointer to indicate it's clickable and adds a right margin for spacing from adjacent text.
+* `#accountInfo p`: Removes default margins from paragraphs within the account information section for uniform alignment.
 Aligns text to the left.
-.item:
-Applies a border, padding, and a light gray background color to each item container.
-Adds margin to the bottom of each item for separation.
-table:
-Ensures the table fills the available width and collapses borders between cells for a seamless look.
-th, td:
-Defines common styling for table headers and cells, including padding, text alignment, and border.
-Sets a light gray background for header cells.
-tr:nth-child(even):
-Applies a light gray background to every even row for better readability.
-.buy-button:
-Styles the buy button with a green background, white text, and no border.
-Expands slightly and changes background color on hover to enhance interactive feedback.
+* `.item`: Applies a border, padding, and a light gray background color to each item container. Adds margin to the bottom of each item for separation.
+* `table`: Ensures the table fills the available width and collapses borders between cells for a seamless look.
+* `th, td`: Defines common styling for table headers and cells, including padding, text alignment, and border. Sets a light gray background for header cells.
+* `tr:nth-child(even)`: Applies a light gray background to every even row for better readability.
+* `.buy-button`: Styles the buy button with a green background, white text, and no border. Expands slightly and changes background color on hover to enhance interactive feedback.
 
 
 npm install web3  
