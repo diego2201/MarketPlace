@@ -1,38 +1,38 @@
-// Initialize a Web3 instance using the MetaMask provider.
+// Initialize Web3 with Ethereum provider from MetaMask
 const web3 = new Web3(window.ethereum);
 
-// Define the ABI for the smart contract to interact with it.
+// Define the contract ABI (Application Binary Interface)
 const contractABI = [
+    // ABI definition for listing a new item
     {
-        // Function to list a new item in the marketplace.
         "constant": false,
         "inputs": [
-            {"name": "_title", "type": "string"},  // Title of the item
-            {"name": "_description", "type": "string"},  // Description of the item
-            {"name": "_price", "type": "uint256"}  // Price of the item in wei
+            {"name": "_title", "type": "string"},
+            {"name": "_description", "type": "string"},
+            {"name": "_price", "type": "uint256"}
         ],
         "name": "listNewItem",
-        "outputs": [],  // No output returned from this function
-        "stateMutability": "nonpayable",  // Indicates that this function does not accept Ether
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
+    // ABI definition for purchasing an item
     {
-        // Function to purchase an item, marking it as sold and transferring ownership.
         "constant": false,
         "inputs": [
-            {"name": "itemId", "type": "uint256"}  // ID of the item to purchase
+            {"name": "itemId", "type": "uint256"}
         ],
         "name": "purchaseItem",
-        "outputs": [],  // No output returned from this function
-        "payable": true,  // Indicates that this function can receive Ether
-        "stateMutability": "payable",  // This function can accept and handle Ether
+        "outputs": [],
+        "payable": true,
+        "stateMutability": "payable",
         "type": "function"
     },
+    // ABI definition for retrieving item details
     {
-        // Function to retrieve details about a specific item by its ID.
         "constant": true,
         "inputs": [
-            {"name": "itemId", "type": "uint256"}  // ID of the item to get details for
+            {"name": "itemId", "type": "uint256"}
         ],
         "name": "getItemDetails",
         "outputs": [
@@ -44,60 +44,112 @@ const contractABI = [
             {"name": "price", "type": "uint256"},
             {"name": "isSold", "type": "bool"}
         ],
-        "stateMutability": "view",  // Indicates that this function does not modify state
+        "stateMutability": "view",
         "type": "function"
     },
+    // ABI definition for getting the total item count in the marketplace
     {
-        // Function to get the total count of items currently available in the marketplace.
         "constant": true,
         "inputs": [],
         "name": "getTotalItemCount",
-        "outputs": [{"name": "", "type": "uint256"}],  // Returns the total number of items
-        "stateMutability": "view",  // Does not alter the state, only views data
+        "outputs": [{"name": "", "type": "uint256"}],
+        "stateMutability": "view",
         "type": "function"
     }
 ];
 
-
-// The smart contract address on the blockchain.
+// Define the smart contract address (on the Ethereum blockchain)
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
-// Load marketplace items and populate the UI.
+// Load marketplace items on the web page
 async function loadMarketplaceItems() {
-    const itemCount = await contract.methods.getTotalItemCount().call();
-    let itemsDisplay = `<table><thead><tr><th>ID</th><th>Title</th><th>Description</th><th>Price (ETH)</th><th>Seller</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+    const itemCount = await contract.methods.getTotalItemCount().call(); // Call the smart contract to get the item count
+    let itemsDisplay = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Price (ETH)</th>
+                    <th>Seller</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>`;
 
     for (let i = 0; i < itemCount; i++) {
-        const item = await contract.methods.getItemDetails(i).call();
-        itemsDisplay += `<tr><td>${item.id}</td><td>${item.title}</td><td>${item.description}</td><td>${web3.utils.fromWei(item.price, 'ether')}</td><td>${item.seller}</td><td>${item.owner}</td><td>${item.isSold ? 'Sold' : 'Available'}</td><td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td></tr>`;
+        const item = await contract.methods.getItemDetails(i).call(); // Retrieve each item's details
+        itemsDisplay += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.title}</td>
+                <td>${item.description}</td>
+                <td>${web3.utils.fromWei(item.price, 'ether')}</td>
+                <td>${item.seller}</td>
+                <td>${item.owner}</td>
+                <td>${item.isSold ? 'Sold' : 'Available'}</td>
+                <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
+            </tr>`;
     }
 
     itemsDisplay += "</tbody></table>";
-    document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
+    document.getElementById('marketplaceItems').innerHTML = itemsDisplay; // Inject the HTML into the DOM
 
-    // Attach event listeners to buy buttons.
-    Array.from(document.getElementsByClassName('buy-button')).forEach(button => {
+    document.querySelectorAll('.buy-button').forEach(button => {
         button.addEventListener('click', function() {
-            purchaseItem(this.getAttribute('data-item-id'));
+            purchaseItem(this.getAttribute('data-item-id')); // Add event listeners to all buy buttons
         });
     });
 }
 
-// Listen for the DOMContentLoaded event to trigger loading marketplace items.
-window.addEventListener('DOMContentLoaded', loadMarketplaceItems);
+// This function initializes loading of marketplace items when the window loads
+window.addEventListener('load', function() {
+    loadMarketplaceItems();
+});
 
-// Purchase an item from the marketplace.
+// Function to handle the purchase of an item
 async function purchaseItem(itemId) {
     try {
+        // Request account access from MetaMask
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const from = accounts[0];
+
+        // Encode the call to retrieve item details
         const data = contract.methods.getItemDetails(itemId).encodeABI();
-        const itemDetails = await window.ethereum.request({method: 'eth_call', params: [{to: contract.options.address, data: data}], from: from});
+
+        // Call the contract to get the item details
+        const itemDetails = await window.ethereum.request({
+            method: 'eth_call',
+            params: [{
+                to: contract.options.address,
+                data: data
+            }],
+            from: from
+        });
+
+        // Decode the returned data
         const decodedItemDetails = web3.eth.abi.decodeParameters(['uint256', 'address', 'address', 'string', 'string', 'uint256', 'bool'], itemDetails);
         const itemPrice = decodedItemDetails[5];
-        const txParams = {from: from, to: contract.options.address, data: contract.methods.purchaseItem(itemId).encodeABI(), value: web3.utils.toHex(itemPrice), gas: web3.utils.toHex(await contract.methods.purchaseItem(itemId).estimateGas({ from: from, value: itemPrice }))};
-        const transactionHash = await window.ethereum.request({method: 'eth_sendTransaction', params: [txParams]});
+
+        // Prepare the transaction parameters for the purchase
+        const txParams = {
+            from: from,
+            to: contract.options.address,
+            data: contract.methods.purchaseItem(itemId).encodeABI(),
+            value: web3.utils.toHex(itemPrice),
+            gas: web3.utils.toHex(await contract.methods.purchaseItem(itemId).estimateGas({ from: from, value: itemPrice })),
+        };
+
+        // Send the transaction via MetaMask
+        const transactionHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txParams],
+        });
+
         console.log('Purchase successful:', transactionHash);
         alert(`Item ${itemId} purchased successfully! Transaction Hash: ${transactionHash}`);
     } catch (error) {
@@ -106,7 +158,53 @@ async function purchaseItem(itemId) {
     }
 }
 
-// Connect to MetaMask wallet.
+// Function to list a new item in the marketplace
+async function listNewItem() {
+    try {
+        const title = document.getElementById('itemTitle').value;
+        const description = document.getElementById('itemDescription').value;
+        const price = document.getElementById('itemPrice').value;
+
+        if (!title || !description || !price) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // Request account access from MetaMask
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const from = accounts[0];
+
+        // Encode the transaction data
+        const data = contract.methods.listNewItem(title, description, price).encodeABI();
+
+        // Transaction parameters
+        const txParams = {
+            from: from,
+            to: contract.options.address,
+            data: data,
+            gas: web3.utils.toHex(await contract.methods.listNewItem(title, description, price).estimateGas({ from: from })),
+        };
+
+        // Send the transaction via MetaMask
+        const txHash = await window.ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [txParams],
+        });
+
+        console.log('Item listed successfully:', txHash);
+        alert(`Item listed successfully! Transaction Hash: ${txHash}`);
+
+        // Clear the form inputs after successful submission
+        document.getElementById('itemTitle').value = '';
+        document.getElementById('itemDescription').value = '';
+        document.getElementById('itemPrice').value = '';
+    } catch (error) {
+        console.error('Error listing item:', error);
+        alert(`Failed to list item: ${error.message}`);
+    }
+}
+
+// Function to connect to MetaMask wallet
 async function connectMetamask() {
     if (window.ethereum) {
         try {
@@ -124,7 +222,7 @@ async function connectMetamask() {
     }
 }
 
-// Display account information.
+// Function to display the account information
 async function displayAccountInfo(account) {
     const balance = await web3.eth.getBalance(account);
     const balanceInEther = web3.utils.fromWei(balance, 'ether');
