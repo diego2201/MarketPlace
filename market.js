@@ -137,7 +137,7 @@ function checkItemStatusAndCount() {
 }
 
 // Monitor item status and count every 10 seconds
-setInterval(checkItemStatusAndCount, 10000);
+setInterval(checkItemStatusAndCount, 8000);
 
 window.addEventListener('load', function() {
     loadMarketplaceItems();
