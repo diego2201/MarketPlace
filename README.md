@@ -21,8 +21,8 @@ The MarketPlace.sol is the contract created that our website uses to interact wi
 ## Frontend
 The frontend encompasses the JavaScript, HTML, and CSS fiels. In the JavaScript code we utilize the Web3.js library to interact with an Ethereum blockchain through the MarketPlace.sol smart contract from a web interface. It integrates with MetaMask, to enable users to list items for sale, purchase items, and view detailed information about items directly from their browsers and signs off on any actions using their account that is linked with MetaMask. The code defines several functions to interact with the smart contract, including listing new items, purchasing items, and fetching detailed information and total count of items available in the marketplace. The script automatically loads marketplace items when the webpage is loaded. <br /><br />
 
-<strong>market.js</strong>
-This file contains most of the functions that help interact with the smart contract and connects that to the website. For example it reads all of the current listings from the smart contract and displays that to the user. <br /><br />
+<strong>market.js</strong> <br />
+This file contains most of the functions that help interact with the smart contract and connects that to the website. For example it reads all of the current listings from the smart contract and displays that to the user. <br />
 
 * `loadMarketplaceItems()`: Fetches and displays all the items listed in the marketplace. It retrieves the total number of items from the smart contract, iterates through each item to get its details, and constructs a dynamic HTML table displaying each item's properties and a buy button if the item is available.
 * `checkItemStatusAndCount()`: Function to check if there are any new listings, or if the sell status of any current itme has been changed. This helps facilitate the resfreshing of the page automatically upon any of these changes.
@@ -31,8 +31,8 @@ This file contains most of the functions that help interact with the smart contr
 * `connectMetamask()`: Connects to the MetaMask wallet to authenticate the user and fetch their account details. It ensures the user can interact with the smart contract by confirming that they are logged into MetaMask and displaying their address and connection status.
 * `displayAccountInfo(account)`: Displays the Ethereum account balance of the connected MetaMask user. It fetches the balance, converts it from wei to ether for readability, and updates the user interface with the current balance information.
 
-<strong>index.html</strong>
-This HTML structure provides a user-friendly interface to interact with a blockchain-based marketplace, leveraging Web3 technologies to handle transactions and account management seamlessly in a decentralized environment. <br /><br />
+<strong>index.html</strong> <br />
+This HTML structure provides a user-friendly interface to interact with a blockchain-based marketplace, leveraging Web3 technologies to handle transactions and account management seamlessly in a decentralized environment. <br />
 
 Main Components: <br />
 * `Banner (<div class="banner">)`: Displays a title ("Marketplace Web3 Interface") and houses user interaction elements like account information and connection status.
@@ -50,6 +50,36 @@ Scripts: <br />
 * `Custom JavaScript File (market.js)`: Contains the logic to interact with the Ethereum blockchain using the smart contract's ABI and address. It handles UI updates based on blockchain interactions like listing items, purchasing, and displaying account balances.
 
 
+<strong>styles.css</strong> <br />
+.banner:
+Sets a dark red background color and white text.
+Applies flexbox layout, stacking child elements vertically and aligning them to the start (left side).
+Adds padding around the content within the banner for spacing.
+.banner h1:
+Removes the default margin from the h1 element to allow for tighter spacing control within the banner.
+.connection-status:
+Uses flexbox to lay out child elements horizontally and center-aligns them vertically.
+Adds a margin below itself for spacing between the connection status and the account info.
+.metamask-button:
+Displays the MetaMask logo as a background image, covering the button entirely.
+Sets specific dimensions for the button and removes the border for a cleaner appearance.
+Changes the cursor to a pointer to indicate it's clickable and adds a right margin for spacing from adjacent text.
+#accountInfo p:
+Removes default margins from paragraphs within the account information section for uniform alignment.
+Aligns text to the left.
+.item:
+Applies a border, padding, and a light gray background color to each item container.
+Adds margin to the bottom of each item for separation.
+table:
+Ensures the table fills the available width and collapses borders between cells for a seamless look.
+th, td:
+Defines common styling for table headers and cells, including padding, text alignment, and border.
+Sets a light gray background for header cells.
+tr:nth-child(even):
+Applies a light gray background to every even row for better readability.
+.buy-button:
+Styles the buy button with a green background, white text, and no border.
+Expands slightly and changes background color on hover to enhance interactive feedback.
 
 
 npm install web3  
