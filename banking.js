@@ -224,23 +224,7 @@ async function connectMetamask() {
 
 // Function to display the account information
 async function displayAccountInfo(account) {
-    let lastBalance = null;
-
-    async function updateBalance() {
-        const balance = await web3.eth.getBalance(account);
-        if (balance !== lastBalance) {
-            const balanceInEther = web3.utils.fromWei(balance, 'ether');
-            document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
-            lastBalance = balance;
-        }
-    }
-
-    updateBalance(); // Run immediately to update balance
-    setInterval(updateBalance, 10000); // Check every 10 seconds
+    const balance = await web3.eth.getBalance(account);
+    const balanceInEther = web3.utils.fromWei(balance, 'ether');
+    document.getElementById('userBalance').textContent = parseFloat(balanceInEther).toFixed(4);
 }
-
-// Usage
-connectMetamask().then(() => {
-    const account = web3.eth.accounts[0]; // Assuming the account is available after connecting
-    displayAccountInfo(account);
-});
