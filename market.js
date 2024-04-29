@@ -64,43 +64,84 @@ const contractAddress = '0x1E04f7C1CAf3D5aD46b5967994e42e0802B06023';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 
-let lastKnownItemCount = 0; // Variable to store the last known item count
+let lastItemCount = 0; // Variable to store the last known item count
+let itemStatus = new Map(); // Store item sold status to track changes
 
 async function loadMarketplaceItems() {
     const itemCount = await contract.methods.getTotalItemCount().call();
-    if (itemCount !== lastKnownItemCount) {
-        lastKnownItemCount = itemCount;
-        let itemsDisplay = `<table><thead><tr><th>ID</th><th>Title</th><th>Description</th><th>Price (ETH)</th><th>Seller</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+    if (itemCount !== lastItemCount) {
+        console.log('New item(s) listed.');
+        lastItemCount = itemCount; // Update the stored item count
+    }
 
-        for (let i = 0; i < itemCount; i++) {
-            const item = await contract.methods.getItemDetails(i).call();
-            itemsDisplay += `<tr><td>${item.id}</td><td>${item.title}</td><td>${item.description}</td><td>${web3.utils.fromWei(item.price, 'ether')}</td><td>${item.seller}</td><td>${item.owner}</td><td>${item.isSold ? 'Sold' : 'Available'}</td><td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td></tr>`;
+    let itemsDisplay = `
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Description</th>
+                    <th>Price (ETH)</th>
+                    <th>Seller</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>`;
+
+    for (let i = 0; i < itemCount; i++) {
+        const item = await contract.methods.getItemDetails(i).call();
+        itemStatus.set(item.id, item.isSold);
+        itemsDisplay += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.title}</td>
+                <td>${item.description}</td>
+                <td>${web3.utils.fromWei(item.price, 'ether')}</td>
+                <td>${item.seller}</td>
+                <td>${item.owner}</td>
+                <td>${item.isSold ? 'Sold' : 'Available'}</td>
+                <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
+            </tr>`;
+    }
+
+    itemsDisplay += "</tbody></table>";
+    document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
+
+    document.querySelectorAll('.buy-button').forEach(button => {
+        button.addEventListener('click', function() {
+            purchaseItem(this.getAttribute('data-item-id'));
+        });
+    });
+}
+
+function checkItemStatusAndCount() {
+    contract.methods.getTotalItemCount().call().then(newItemCount => {
+        if (newItemCount !== lastItemCount) {
+            lastItemCount = newItemCount;
+            loadMarketplaceItems();
+            console.log('Item count changed. Reloading items...');
         }
 
-        itemsDisplay += "</tbody></table>";
-        document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
-
-        document.querySelectorAll('.buy-button').forEach(button => {
-            button.addEventListener('click', function() {
-                purchaseItem(this.getAttribute('data-item-id'));
+        for (let i = 0; i < newItemCount; i++) {
+            contract.methods.getItemDetails(i).call().then(item => {
+                if (itemStatus.get(item.id) !== item.isSold) {
+                    itemStatus.set(item.id, item.isSold);
+                    console.log(`Item ${item.id} status updated to ${item.isSold ? 'Sold' : 'Available'}`);
+                    loadMarketplaceItems();
+                }
             });
-        });
-    }
+        }
+    });
 }
 
-function checkItemCount() {
-    contract.methods.getTotalItemCount().call()
-        .then(currentItemCount => {
-            if (currentItemCount !== lastKnownItemCount) {
-                loadMarketplaceItems();
-            }
-        })
-        .catch(console.error);
-}
+// Monitor item status and count every 10 seconds
+setInterval(checkItemStatusAndCount, 10000);
 
-setInterval(checkItemCount, 5000); // Poll every 5 seconds
-
-window.addEventListener('load', loadMarketplaceItems);
+window.addEventListener('load', function() {
+    loadMarketplaceItems();
+});
 
 // Function to handle the purchase of an item
 async function purchaseItem(itemId) {
