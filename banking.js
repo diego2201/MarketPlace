@@ -1,33 +1,38 @@
+// Initialize a Web3 instance using the MetaMask provider.
 const web3 = new Web3(window.ethereum);
 
+// Define the ABI for the smart contract to interact with it.
 const contractABI = [
     {
+        // Function to list a new item in the marketplace.
         "constant": false,
         "inputs": [
-            {"name": "_title", "type": "string"},
-            {"name": "_description", "type": "string"},
-            {"name": "_price", "type": "uint256"}
+            {"name": "_title", "type": "string"},  // Title of the item
+            {"name": "_description", "type": "string"},  // Description of the item
+            {"name": "_price", "type": "uint256"}  // Price of the item in wei
         ],
         "name": "listNewItem",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "outputs": [],  // No output returned from this function
+        "stateMutability": "nonpayable",  // Indicates that this function does not accept Ether
         "type": "function"
     },
     {
+        // Function to purchase an item, marking it as sold and transferring ownership.
         "constant": false,
         "inputs": [
-            {"name": "itemId", "type": "uint256"}
+            {"name": "itemId", "type": "uint256"}  // ID of the item to purchase
         ],
         "name": "purchaseItem",
-        "outputs": [],
-        "payable": true,
-        "stateMutability": "payable",
+        "outputs": [],  // No output returned from this function
+        "payable": true,  // Indicates that this function can receive Ether
+        "stateMutability": "payable",  // This function can accept and handle Ether
         "type": "function"
     },
     {
+        // Function to retrieve details about a specific item by its ID.
         "constant": true,
         "inputs": [
-            {"name": "itemId", "type": "uint256"}
+            {"name": "itemId", "type": "uint256"}  // ID of the item to get details for
         ],
         "name": "getItemDetails",
         "outputs": [
@@ -39,113 +44,60 @@ const contractABI = [
             {"name": "price", "type": "uint256"},
             {"name": "isSold", "type": "bool"}
         ],
-        "stateMutability": "view",
+        "stateMutability": "view",  // Indicates that this function does not modify state
         "type": "function"
     },
     {
+        // Function to get the total count of items currently available in the marketplace.
         "constant": true,
         "inputs": [],
         "name": "getTotalItemCount",
-        "outputs": [{"name": "", "type": "uint256"}],
-        "stateMutability": "view",
+        "outputs": [{"name": "", "type": "uint256"}],  // Returns the total number of items
+        "stateMutability": "view",  // Does not alter the state, only views data
         "type": "function"
     }
 ];
 
+
+// The smart contract address on the blockchain.
 const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
-//const contractAddress = '0xeE1Ab6F5aD7c60cdFcc5f8d334E85F98fBCEcCb2';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
+// Load marketplace items and populate the UI.
 async function loadMarketplaceItems() {
     const itemCount = await contract.methods.getTotalItemCount().call();
-    let itemsDisplay = `
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Title</th>
-                        <th>Description</th>
-                        <th>Price (ETH)</th>
-                        <th>Seller</th>
-                        <th>Owner</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>`;
+    let itemsDisplay = `<table><thead><tr><th>ID</th><th>Title</th><th>Description</th><th>Price (ETH)</th><th>Seller</th><th>Owner</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
 
     for (let i = 0; i < itemCount; i++) {
         const item = await contract.methods.getItemDetails(i).call();
-        itemsDisplay += `
-            <tr>
-                <td>${item.id}</td>
-                <td>${item.title}</td>
-                <td>${item.description}</td>
-                <td>${web3.utils.fromWei(item.price, 'ether')}</td>
-                <td>${item.seller}</td>
-                <td>${item.owner}</td>
-                <td>${item.isSold ? 'Sold' : 'Available'}</td>
-                <td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td>
-            </tr>`;
+        itemsDisplay += `<tr><td>${item.id}</td><td>${item.title}</td><td>${item.description}</td><td>${web3.utils.fromWei(item.price, 'ether')}</td><td>${item.seller}</td><td>${item.owner}</td><td>${item.isSold ? 'Sold' : 'Available'}</td><td>${!item.isSold ? `<button class="buy-button" data-item-id="${item.id}">Buy</button>` : 'N/A'}</td></tr>`;
     }
 
     itemsDisplay += "</tbody></table>";
     document.getElementById('marketplaceItems').innerHTML = itemsDisplay;
 
-    document.querySelectorAll('.buy-button').forEach(button => {
+    // Attach event listeners to buy buttons.
+    Array.from(document.getElementsByClassName('buy-button')).forEach(button => {
         button.addEventListener('click', function() {
             purchaseItem(this.getAttribute('data-item-id'));
         });
     });
 }
 
-window.addEventListener('load', function() {
-    loadMarketplaceItems(); // Automatically load items when the page loads
-});
+// Listen for the DOMContentLoaded event to trigger loading marketplace items.
+window.addEventListener('DOMContentLoaded', loadMarketplaceItems);
 
-
+// Purchase an item from the marketplace.
 async function purchaseItem(itemId) {
     try {
-        // Request account access from MetaMask
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         const from = accounts[0];
-
-        // Instead of using contract.methods.call(), which might use Infura depending on your Web3 setup,
-        // use MetaMask's request method to make the call directly through the user's wallet extension.
-        // This assumes that `contract` is a web3.eth.Contract instance initialized with MetaMask's provider.
-
-        // Encode the call to the method getItemDetails
         const data = contract.methods.getItemDetails(itemId).encodeABI();
-
-        // Use MetaMask to call the contract and get the item details
-        const itemDetails = await window.ethereum.request({
-            method: 'eth_call',
-            params: [{
-                to: contract.options.address,
-                data: data
-            }],
-            from: from
-        });
-
-        // Decode the returned data from the call
+        const itemDetails = await window.ethereum.request({method: 'eth_call', params: [{to: contract.options.address, data: data}], from: from});
         const decodedItemDetails = web3.eth.abi.decodeParameters(['uint256', 'address', 'address', 'string', 'string', 'uint256', 'bool'], itemDetails);
         const itemPrice = decodedItemDetails[5];
-
-        // Send the purchase transaction
-        const txParams = {
-            from: from,
-            to: contract.options.address,
-            data: contract.methods.purchaseItem(itemId).encodeABI(),
-            value: web3.utils.toHex(itemPrice), // Convert the price to hex value
-            gas: web3.utils.toHex(await contract.methods.purchaseItem(itemId).estimateGas({ from: from, value: itemPrice })),
-        };
-
-        // Use MetaMask to send the transaction
-        const transactionHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txParams],
-        });
-
+        const txParams = {from: from, to: contract.options.address, data: contract.methods.purchaseItem(itemId).encodeABI(), value: web3.utils.toHex(itemPrice), gas: web3.utils.toHex(await contract.methods.purchaseItem(itemId).estimateGas({ from: from, value: itemPrice }))};
+        const transactionHash = await window.ethereum.request({method: 'eth_sendTransaction', params: [txParams]});
         console.log('Purchase successful:', transactionHash);
         alert(`Item ${itemId} purchased successfully! Transaction Hash: ${transactionHash}`);
     } catch (error) {
@@ -154,54 +106,7 @@ async function purchaseItem(itemId) {
     }
 }
 
-
-
-async function listNewItem() {
-    try {
-        const title = document.getElementById('itemTitle').value;
-        const description = document.getElementById('itemDescription').value;
-        const price = document.getElementById('itemPrice').value; // Ensure this is in wei before passing
-
-        if (!title || !description || !price) {
-            alert('Please fill in all fields');
-            return;
-        }
-
-        // Request account access from MetaMask
-        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const from = accounts[0];
-
-        // Encode the ABI for the listNewItem function call
-        const data = contract.methods.listNewItem(title, description, price).encodeABI();
-
-        // Prepare transaction parameters
-        const txParams = {
-            from: from,
-            to: contract.options.address,
-            data: data,
-            gas: web3.utils.toHex(await contract.methods.listNewItem(title, description, price).estimateGas({ from: from })),
-        };
-
-        // Send the transaction using MetaMask
-        const txHash = await window.ethereum.request({
-            method: 'eth_sendTransaction',
-            params: [txParams],
-        });
-
-        console.log('Item listed successfully:', txHash);
-        alert(`Item listed successfully! Transaction Hash: ${txHash}`);
-
-        // Optionally, clear inputs after successful transaction
-        document.getElementById('itemTitle').value = '';
-        document.getElementById('itemDescription').value = '';
-        document.getElementById('itemPrice').value = '';
-    } catch (error) {
-        console.error('Error listing item:', error);
-        alert(`Failed to list item: ${error.message}`);
-    }
-}
-
-
+// Connect to MetaMask wallet.
 async function connectMetamask() {
     if (window.ethereum) {
         try {
@@ -219,6 +124,7 @@ async function connectMetamask() {
     }
 }
 
+// Display account information.
 async function displayAccountInfo(account) {
     const balance = await web3.eth.getBalance(account);
     const balanceInEther = web3.utils.fromWei(balance, 'ether');
