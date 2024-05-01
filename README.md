@@ -2,11 +2,47 @@
 This project is an Ethereum-based Marketplace Interface that enables users to interact with a smart contract to allows them to list items for sale, purchase them, and view item details directly from their browser using their MetaMask account. <br /> <br />
 <strong>Please Note</strong> That for this website you will need to wait a few seconds (and maybe even just reload the page) to see changes to the listing appear. 
 
-## What is needed to use
+## Website Link
+https://diego2201.github.io/MarketPlace/
+
+## Prerequisits 
+<strong>To use website </strong>
+Ensure you have the following installed in your browser:
+- [Metamask](https://metamask.io/download/) (IMPORTANT, needed to properly interact with blockchain) <br />
+
 All you need installed to use this website application is the Metamask extension. In order to download this (on Google Chrome) go to the following link: [Metamask Extension Chrome Download](https://chromewebstore.google.com/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn)
  <br /> <br />
 Once installed you just need to make an account. Once created you will need some Sepolia testnet coins to be able to actually interact with the Marketplace. You can obtain some using the following faucet site: [Sepolia Faucet](https://sepolia-faucet.pk910.de/#/claim/2b9f1b9c-883e-4f68-b9f8-7239a31f4a73) <br /> <br />
 Now you will be able to interact with the website! <br />
+
+<strong>To Recreate Project</strong>
+Make sure you have the following installed on your local machine: 
+- [Node.js](https://nodejs.org/) (v14 or higher)
+- [npm](https://www.npmjs.com/) (v6 or higher)
+- [Web3](https://www.npmjs.com/package/web3)
+- [Metamask](https://metamask.io/download/) 
+
+
+## Setting up Project 
+
+1. Clone the repo or download the zip file:
+```
+git clone https://github.com/diego2201/MarketPlace.git
+```
+
+2. Now you can CD into the directory and begin working: 
+```
+cd MarketPlace
+```
+
+3. Now you will need to install the necessary Node.js modules
+
+```
+npm install
+npm install web3 
+```
+
+4. To view any changes you can create your own github pages repo. 
 
 # Code Documentation 
 ## Solidity Contract 
@@ -50,9 +86,6 @@ Scripts: <br />
 * `Web3.js Import`: Includes the Web3.js library from a content delivery network (CDN), which is essential for interacting with Ethereum blockchain directly from the browser.
 * `Custom JavaScript File (market.js)`: Contains the logic to interact with the Ethereum blockchain using the smart contract's ABI and address. It handles UI updates based on blockchain interactions like listing items, purchasing, and displaying account balances.
 <br />
-
-
-* ``:
 
 <strong>styles.css</strong> <br />
 * `.banner`: Sets a dark red background color and white text.
