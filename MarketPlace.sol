@@ -40,6 +40,7 @@ contract Marketplace {
 
     // Function to list a new item for sale
     function listNewItem(string memory _title, string memory _description, uint256 _price) external {
+        require(_price > 0, "Price must be at least 1 wei");
         Item storage newItem = items[nextItemId]; // Access the next item in the map
         newItem.id = nextItemId; // Set the item ID
         newItem.seller = payable(msg.sender); // Set the seller to the message sender
@@ -57,6 +58,7 @@ contract Marketplace {
         require(itemId < nextItemId, "Item does not exist"); // Check if the item exists
         Item storage item = items[itemId]; // Get the item from storage
         require(!item.isSold, "Item is already sold"); // Ensure the item is not already sold
+        require(msg.sender != item.seller, "Seller cannot buy their own item"); // Prevent seller from buying their own item
         require(msg.value == item.price, "Please submit the asking price in order to complete the purchase"); // Ensure correct payment
 
         emit DebugLog(msg.sender, msg.value); // Emit a debug log
@@ -72,6 +74,7 @@ contract Marketplace {
 
         emit ItemPurchased(itemId, msg.sender); // Emit the purchase event
     }
+
 
     // Function to retrieve details of a specific item by its ID
     function getItemDetails(uint256 itemId) public view returns (uint256, address, address, string memory, string memory, uint256, bool) {
