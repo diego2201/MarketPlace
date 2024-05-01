@@ -60,7 +60,7 @@ const contractABI = [
 
 // Define the smart contract address (on the Ethereum blockchain)
 //const contractAddress = '0xA897431171E2C508D75AE6AA327F776709A36e83';
-const contractAddress = '0x1E04f7C1CAf3D5aD46b5967994e42e0802B06023';
+const contractAddress = '0x0ba9624C22fD35daF67B6501c47316FceE7ceB81';
 const contract = new web3.eth.Contract(contractABI, contractAddress);
 
 
