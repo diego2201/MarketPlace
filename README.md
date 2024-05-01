@@ -19,6 +19,14 @@ Make sure you have the following installed on your local machine:
 - [Web3](https://www.npmjs.com/package/web3)
 - [Metamask](https://metamask.io/download/) 
 
+## Quirks
+When using this website please consider that there may be some quirks. <br />
+The main consideration here is that you NEED Metamask installed and set up to use the website. Because of the limitations of Infura I decided to move away from using that as my Web3 provider and moved to metamask. The downside in doing this, is that the listings won't appear until you link your MetaMask account <br />
+
+The JS file checks every few seconds if there is an update made to the listings, if something has been bought, or if something new has been listed. Because of this there may be a bit of a delay before the website refreshes. If this happens feel free to refresh the page to see the changes. <br />
+
+If you are using more than one MetaMask account, you will need to manually switch your current account through your browser extension. Once done the website may not update the user's current address and balance. To do so all you need to do is click on the connect button and it should update those values. The same goes when something is purchased, the balance won't update unless you refresh the page and reconnect, or just re click the connect button to update it. 
+
 # Code Documentation 
 ## Solidity Contract 
 The MarketPlace.sol is the contract created that our website uses to interact with the Etherum network. It is designed to manage this DApp marketplace where items can be listed, sold, and purchased. The contract includes struct data structures (Item and Account) to keep track of each item's properties (such as its ID number, the name, any additional descriptions, its listing price, seller's address, owner's address, and its sold status) and each account information (such as their current balance and their purchased items). It uses mappings to link item IDs to their details and user addresses to their accounts. The contract allows users to list new items for sale and purchase available items while ensuring transactions are valid through various checks. Events are emitted for item purchases and for debugging purposes to log important state changes and financial transactions. This helps with the frontend integration. <br /><br />
