@@ -19,28 +19,6 @@ Make sure you have the following installed on your local machine:
 - [Web3](https://www.npmjs.com/package/web3)
 - [Metamask](https://metamask.io/download/) 
 
-
-## Setting up Project 
-
-1. Clone the repo or download the zip file:
-```
-git clone https://github.com/diego2201/MarketPlace.git
-```
-
-2. Now you can CD into the directory and begin working: 
-```
-cd MarketPlace
-```
-
-3. Now you will need to install the necessary Node.js modules
-
-```
-npm install
-npm install web3 
-```
-
-4. To view any changes you can create your own github pages repo. 
-
 # Code Documentation 
 ## Solidity Contract 
 The MarketPlace.sol is the contract created that our website uses to interact with the Etherum network. It is designed to manage this DApp marketplace where items can be listed, sold, and purchased. The contract includes struct data structures (Item and Account) to keep track of each item's properties (such as its ID number, the name, any additional descriptions, its listing price, seller's address, owner's address, and its sold status) and each account information (such as their current balance and their purchased items). It uses mappings to link item IDs to their details and user addresses to their accounts. The contract allows users to list new items for sale and purchase available items while ensuring transactions are valid through various checks. Events are emitted for item purchases and for debugging purposes to log important state changes and financial transactions. This helps with the frontend integration. <br /><br />
@@ -98,6 +76,3 @@ Aligns text to the left.
 * `th, td`: Defines common styling for table headers and cells, including padding, text alignment, and border. Sets a light gray background for header cells.
 * `tr:nth-child(even)`: Applies a light gray background to every even row for better readability.
 * `.buy-button`: Styles the buy button with a green background, white text, and no border. Expands slightly and changes background color on hover to enhance interactive feedback.
-
-
-npm install web3  
