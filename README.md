@@ -25,6 +25,8 @@ The main consideration here is that you NEED Metamask installed and set up to us
 
 The JS file checks every few seconds if there is an update made to the listings, if something has been bought, or if something new has been listed. Because of this there may be a bit of a delay before the website refreshes. If this happens feel free to refresh the page to see the changes. <br />
 
+Please also consider that when you are listing an item it asks for the list price in Wei and not the whole Eth. So if you want to list something as 1 ETH, please enter: 1000000000000000000 instead. This is a quirk that was carried over from when I was testing in the Remix IDE. 
+
 If you are using more than one MetaMask account, you will need to manually switch your current account through your browser extension. Once done the website may not update the user's current address and balance. To do so all you need to do is click on the connect button and it should update those values. The same goes when something is purchased, the balance won't update unless you refresh the page and reconnect, or just re click the connect button to update it. 
 
 # Code Documentation 
