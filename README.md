@@ -86,3 +86,11 @@ Aligns text to the left.
 * `th, td`: Defines common styling for table headers and cells, including padding, text alignment, and border. Sets a light gray background for header cells.
 * `tr:nth-child(even)`: Applies a light gray background to every even row for better readability.
 * `.buy-button`: Styles the buy button with a green background, white text, and no border. Expands slightly and changes background color on hover to enhance interactive feedback.
+
+## Sources
+* https://github.com/dappuniversity/marketplace
+* https://www.youtube.com/watch?v=VH9Q2lf2mNo&list=WL&index=169&t=4422s&ab_channel=DappUniversity
+* https://www.youtube.com/watch?v=QyFcl_Fba-k&ab_channel=NetNinja
+* https://docs.metamask.io/wallet/how-to/sign-data/
+* https://docs.metamask.io/wallet/how-to/send-transactions/
+* https://www.w3schools.com/tags/tag_table.asp
